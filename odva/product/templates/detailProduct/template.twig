@@ -1,0 +1,232 @@
+{% set bredcrumbs = APPLICATION.IncludeComponent('odva:breadcrumbs', '', {
+	'LINKS' : [
+		{'text' : 'Главная страница','url':'/'},
+		{'text' : result['SECTION']['NAME'],'url':result['SECTION']['SECTION_PAGE_URL']}
+	]
+}) %}
+<section class="detail">
+	<div class="container">
+		<div class="row">
+			<div class="detail__product-block clearfix">
+				<div class="detail__product-pretitle detail__product-display">{{ result['SECTION']['NAME'] }}</div>
+				<div class="detail__product-title detail__product-display">{{ resutl['NAME'] }}</div>
+				<div class="detail-product-left-col">
+					<div class="detail__product-slidershadow">
+						<div class="detail__product-slider">
+							{% for picture in result['PROPERTIES']['PICTURES']['SIZES'] %}
+								<div class="detail__product-item">
+									<div class="detail__product-img">
+										<img src="{{ picture['mini']['src'] }}" />
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				<div class="detail-product-right-col">
+					<div class="detail__product-pretitle">{{ result['SECTION']['NAME'] }}</div>
+					<div class="detail__product-title">{{ result['NAME'] }}</div>
+					<div class="detail__product-text">{{ result['PREVIEW_TEXT'] }}</div>
+					<div class="detail__product-list">
+						<div class="detail__product-list-title detail__product-list-title-size">
+							Размеры тары
+						</div>
+						<div class="detail__product-list-size">
+							<ul class="clearfix">
+								{% for offer in result['OFFERS'] %}
+									<li
+										data-offerid="{{ offer['ID'] }}"
+										class="_offer {% if offer['SELECTED'] is defined %}active{% endif %}"
+										onclick="detailProduct.selectOffer({{ offer['ID'] }})"
+										><a href="javascript:void(0)">{{ offer['PROPERTIES']['VALUME']['VALUE'] }}</a>
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<div class="detail__product-list-select">
+							<div class="detail__product-list-hidden-title">
+								Размеры тары
+							</div>
+							<select>
+								{% for offer in result['OFFERS'] %}
+									<option class="_offer" data-offerid="{{ offer['ID'] }}" value="">{{ offer['PROPERTIES']['VALUME']['VALUE'] }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="product-count-768">
+							<div class="detail__product-list-title">
+								Количество
+							</div>
+							<div class="detail__product-list-input">
+								<input
+									onchange="detailProduct.changeQuantity(this)"
+									type="number"
+									class="_offerQuantity"
+									min="1"
+									value="1"
+								/>
+							</div>
+						</div>
+						<div class="detail__product-properties clearfix">
+							<div class="detail__product-price">
+								<div class="detail__product-list-title">
+									Цена
+								</div>
+								<div class="detail__product-list-price _offerPrice"> {{ result['SELECTED_PRICE'] }} </div>
+								<div class="detail__product-list-rouble">
+									<div class="svg-rouble svg-rouble-dims product__slider-svg"></div>
+								</div>
+							</div>
+							<div class="detail__product-count">
+								<div class="detail__product-list-title">
+									Количество
+								</div>
+								<div class="detail__product-list-input">
+									<input
+										onchange="detailProduct.changeQuantity(this)"
+										type="number"
+										class="_offerQuantity"
+										min="1"
+										value="1"
+									/>
+								</div>
+							</div>
+							<div class="detail__product-available">
+								<div class="detail__product-list-title">
+									Наличие
+								</div>
+								<div class="detail__product-list-svg">
+									<div class="svg-available svg-available-dims"></div>
+								</div>
+								<div class="detail__product-list-avtext">
+									Наша компания является производителем, поэтому весь товар всегда есть в наличии.
+								</div>
+							</div>
+						</div>
+						<div class="detail__product-bottom">
+							<div class="detail__product-addtocart">
+								<div class="detail__product-cartbutton">
+									<button onclick="detailProduct.addCurrentOfferToCart(this)" class="t-button-text t-button-orangegradient">
+										<div class="detail__product-svg">
+											{% include '/html/src/inc/svg/cart.html' %}
+										</div>
+										<span class="_inCartHtml">Добавить в корзину</span>
+									</button>
+								</div>
+							</div>
+							<div class="detail__product-oneclick">
+								<button onclick="detailProduct.showOneClickOrder()" class="t-button-text t-button-blue-border">Купить в 1 клик</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="detail__product-bottom-hidden">
+					<div class="detail__product-addtocart">
+						<div class="detail__product-cartbutton">
+							<button onclick="detailProduct.addCurrentOfferToCart(this)" class="t-button-text t-button-orangegradient">
+								<div class="detail__product-svg">
+									{% include '/html/src/inc/svg/cart.html' %}
+								</div>
+								<span class="_inCartHtml">Добавить в корзину</span>
+							</button>
+						</div>
+					</div>
+					<div class="detail__product-oneclick">
+						<button onclick="detailProduct.showOneClickOrder()" class="t-button-text t-button-blue-border">Купить в 1 клик</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="detail-descr">
+	<div class="container">
+			<div class="detail-descr-content clearfix">
+				<div class="detail-descr__left">
+					<div class="detail__product-characteristics">
+						<div class="detail__product-characteristics-title">
+							Описание технических характеристик
+						</div>
+						<div class="detail-descr__hidden-text">
+							{{ result['DETAIL_TEXT'] }}
+						</div>
+						<div class="characteristics__button">
+							<a onclick="o2.showDescr('.detail-descr__hidden-text', this);" href="javascript:void(0)">Читать подробное описание</a>
+						</div>
+						{% if result['SHOW_PROPERTIES']|length %}
+							<div class="characteristics__table">
+								{% for showProp in result['SHOW_PROPERTIES'] %}
+									<div class="characteristics__table-item clearfix">
+										<div class="characteristics__table-item-name">
+											{{ showProp['name'] }}
+										</div>
+										<div class="characteristics__table-item-value">
+											{{ showProp['value'] }}
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+				{% if result['SHOW_PROPERTIES']|length %}
+					<div class="characteristics__table__320-row row">
+						<div class="characteristics__table characteristics__table__320">
+							{% for showProp in result['SHOW_PROPERTIES'] %}
+								<div class="characteristics__table-item clearfix">
+									<div class="characteristics__table-item-name">
+										{{ showProp['name'] }}
+									</div>
+									<div class="characteristics__table-item-value">
+										{{ showProp['value'] }}
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endif %}
+				<div class="detail-descr__right">
+					<div class="detail__product-testimonials clearfix">
+						<div class="detail__product-testimonials__top clearfix">
+							<div class="detail__product-testimonials-title">
+								Отзывы о продукте
+							</div>
+							<div class="detail__product-testimonials-stars">
+								<div class="svg-star svg-star-dims testimonials-star"></div>
+								<div class="svg-star svg-star-dims testimonials-star"></div>
+								<div class="svg-star svg-star-dims testimonials-star"></div>
+								<div class="svg-star svg-star-dims testimonials-star"></div>
+								<div class="svg-star svg-star-dims testimonials-star"></div>
+							</div>
+						</div>
+						{% if result['PROPERTIES']['KEIS']['VALUE'] %}
+							{% set keis = APPLICATION.IncludeComponent('odva:element', 'keisDetail', {
+								'filter':{'IBLOCK_ID':7, 'ID' :result['PROPERTIES']['KEIS']['VALUE'] },
+								'propertiesSettings' : {
+									'PREVIEW_PICTURE' : {
+										'type'  : 'image',
+										'sizes' : {
+											'mini' : {'height' : 308, 'width':313 }
+										}
+									}
+								},
+							}) %}
+						{% endif %}
+					</div>
+					{% set reviews = APPLICATION.IncludeComponent('odva:elements', 'reviewsProduct', {
+						'filter':{
+							'IBLOCK_ID'        :6,
+							'PROPERTY_PRODUCT' :result['ID']
+						},
+						'count':10
+					}) %}
+				</div>
+			</div>
+	</div>
+</section>
+
+{# advantages block #}
+{% include templateFolder~'/advantages.twig' %}
+<script>
+	var detailOffers = {{ result['JSON_OFFERS'] }}
+</script>

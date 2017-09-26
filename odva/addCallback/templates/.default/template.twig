@@ -1,0 +1,22 @@
+<div onclick="event.stopPropagation();" class="popup callback-popup _callbackPopup">
+	<h3 class="callback-popup__title">Обратный звонок</h3>
+	<div onclick="o2.popups.closePopup();" class="popup-close _popupClose">
+		<div class="svg-close svg-close-dims svg-close__icon"></div>
+	</div>
+	<div class="callback-popup__text">
+		Наш менеджер свяжется с вами в ближайшее время и ответит на все ваши вопросы.
+	</div>
+	<form action="{{ result['ADD_PATH'] }}" onsubmit="return callBack.send(this)">
+		<div class="inputs inputs-callback _required">
+			<div class="callback-input-title">Ваше Имя</div>
+			<input placeholder="Как к вам обращаться?" type="text" class="input" name="name">
+		</div>
+		<div class="inputs inputs-callback _required">
+			<div class="callback-input-title">Контактный телефон</div>
+			<input placeholder="+7 (495) 558-24-53" type="text" class="input _phone-mask" name="phone">
+		</div>
+		<div class="callback-buttons-block">
+			<button type="submit" class="t-button-text t-button-bluegradient">Перезвоните мне</button>
+		</div>
+	</form>
+</div>

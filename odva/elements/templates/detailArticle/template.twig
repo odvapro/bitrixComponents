@@ -1,0 +1,30 @@
+{% set bredcrumbs = APPLICATION.IncludeComponent('odva:breadcrumbs', '', {
+	'LINKS' : [
+		{'text' : 'Главная страница','url':'/'},
+		{'text' : 'Новости','url':'/information/'},
+		{'text' :result['DETAIL']['NAME'], },
+	]
+}) %}
+<section class="article-detail">
+	<div class="article-container">
+		<div class="article-detail__title">
+		{{ result['DETAIL']['NAME'] }}
+		</div>
+		<div class="article-detail-content clearfix">
+			<div class="article-detail__picture">
+				<img src="{{ result['DETAIL']['DETAIL_PICTURE'] }}" alt="{{ result['DETAIL']['NAME'] }}">
+				<div class="article-detail__picture-text">
+					<div class="article-detail__picture-text-date">
+						{{ result['DETAIL']['DATE_CREATE_FORMAT'] }}
+					</div>
+					<div class="article-detail__picture-text-title">
+						Рекомендации в подборе
+					</div>
+				</div>
+			</div>
+			<div class="article-detail__text">
+				{{ result['DETAIL']['DETAIL_TEXT'] }}
+			</div>
+		</div>
+	</div>
+</section>

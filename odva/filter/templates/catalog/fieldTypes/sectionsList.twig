@@ -1,0 +1,15 @@
+<div class="catalog__left-filter">
+	<div class="filter__title">Сфера применения</div>
+	<div class="filter__block _filterField"
+		data-fieldtype="list"
+		data-fieldname="sphere"
+	>
+		{% for fieldItem in field['VALUES'] %}
+			<label class="checkbox-label filter-checkbox-label">
+				<input type="checkbox" class="checkbox" value="{{ fieldItem['ID'] }}" {{ (fieldItem['SELECTED'] is defined)?'checked':'' }}>
+				<span></span>
+				{{ fieldItem['NAME'] }}
+			</label>
+		{% endfor %}
+	</div>
+</div>

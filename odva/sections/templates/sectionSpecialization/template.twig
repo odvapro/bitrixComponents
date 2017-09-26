@@ -1,0 +1,39 @@
+<section class="specialization">
+	<div class="spec__block">
+		{% for sectionKey,section in result['SECTIONS'] %}
+			<div class="{% if sectionKey == 0 %}
+				spec__left
+			{% elseif sectionKey == 1 %}
+				spec__middle
+			{% elseif sectionKey == 2 %}
+				spec__right
+			{% endif %}" style="background-image:url({{ section['PICTURE']['src'] }})">
+				<div class="spec__textblock">
+					<div class="spec__pretitle">
+						{{ section['ELEMENTS_COUNT'] }}
+					</div>
+					<div class="spec__title">
+						<a href="{{ section['SECTION_PAGE_URL'] }}">{{ section['NAME'] }}</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	<div class="spec__block-slider">
+		<div class="spec__block-slick">
+			{% for section in result['SECTIONS'] %}
+				<div class="spec__block-slick-picture">
+					<img src="{{ section['PICTURE']['src'] }}" alt="">
+					<div class="spec__block-slick-text">
+						<div class="spec__pretitle">
+							{{ section['ELEMENTS_COUNT'] }}
+						</div>
+						<div class="spec__title">
+							<a href="{{ section['SECTION_PAGE_URL'] }}">{{ section['NAME'] }}</a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</section>

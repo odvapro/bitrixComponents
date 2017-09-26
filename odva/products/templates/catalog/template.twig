@@ -1,0 +1,33 @@
+<div class="col-lg-9 col-md-9 col-sm-12 catalog-col">
+	{% include templateFolder~'/catalog-sorting.twig' %}
+</div>
+
+<div class="col-lg-9 col-md-9 col-sm-12 catalog-col">
+	<div class="catalog__items clearfix">
+		{% for productKey,product in result['PRODUCTS'] if productKey < 6 %}
+			{% include templateFolder~'/catalog-products-element.twig' %}
+		{% endfor %}
+	</div>
+</div>
+{% if result['PRODUCTS'][6] is defined %}
+	{% set product = result['PRODUCTS'][6] %}
+	<div class="col-lg-9 col-lg-offset-3 col-md-9 col-md-offset-3 col-sm-12 big-product-col">
+		{% include templateFolder~'/catalog-product.twig' %}
+	</div>
+{% endif %}
+{% if result['PRODUCTS']|length > 6 %}
+	<div class="col-lg-9 col-lg-offset-3 col-md-9 col-md-offset-3 col-sm-12 catalog-col">
+		<div class="catalog__items clearfix">
+			{% for productKey,product in result['PRODUCTS'] if productKey > 6  %}
+				{% include templateFolder~'/catalog-products-element.twig' %}
+			{% endfor %}
+			<div class="_moreProductsPlace"></div>
+		</div>
+		<div class="catalog__right-button">
+			<button data-nexpage="2" onclick="cSection.loadMore(this)" class="t-button-text t-button-transparenr catalog__right-refresh">
+				<span class="catalog__refresh">{% include '/html/images/svg/refresh.svg' %}</span>
+				Показать еще
+			</button>
+		</div>
+	</div>
+{% endif %}

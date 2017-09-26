@@ -1,0 +1,4 @@
+{% for offerKey,offer in result['OFFERS'] %}
+	{% set product = offer['PRODUCT'] %}
+	{% include templateFolder~'/catalog-products-element.twig' %}
+{% endfor %}

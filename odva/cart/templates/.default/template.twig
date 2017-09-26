@@ -1,0 +1,34 @@
+{% if result['PRODUCT_IDS']|length > 0%}
+	{% set products = APPLICATION.IncludeComponent('odva:offers', 'cart', {
+		'productsFilter' : {},
+		'offersFilter' : {
+			'ID':result['PRODUCT_IDS'],
+			'IBLOCK_ID': 5,
+		},
+		'offerPropertiesSettings': {},
+		'productPropertiesSettings': {
+			'PREVIEW_PICTURE' : {
+				'type' : 'image',
+				'sizes' : {
+					'mini' : {'height' : 364, 'width':364 },
+					'medium' : {'height' : 616, 'width':626 }
+				}
+			}
+		},
+		'cartArray' :result['CART_ARRAY'],
+		'count'     :100,
+		'page'      :1,
+		'sort'      :'',
+	}) %}
+{% else %}
+	<section class="cart-section">
+		<div class="container">
+			<div class="cart-section__title"> Корзина товаров </div>
+			<div class="descr404">
+				<div class="descr404__title">Корзина пуста</div>
+				<div class="descr404__page-not-found">Вы не добавили товов в корзину</div>
+				<a href="/" class="t-button-text t-button-orangegradient go-to-index__btn">Перейти на главную</a>
+			</div>
+		</div>
+	</section>
+{% endif %}

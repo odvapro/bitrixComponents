@@ -1,0 +1,132 @@
+<h3 class="personal-data__title">Личные данные</h3>
+<div class="personal-data-text">
+	Мы используем личные данные, что бы связываться с вами по вопросам ваших заказов. Мы не передаем данные третьим лицам.
+</div>
+<form
+	class="personal-data__form clearfix"
+	action="{{ result['SAVE_PROFILE_PATH'] }}"
+	onsubmit="return profile.save(this);"
+>
+	<label class="personal-page__label _required">
+		<div class="input-title">Ваше ФИО</div>
+		<input
+			value="{{ result['NAME'] }}"
+			type="text"
+			class="input personal-page__input"
+			name="name"
+		>
+	</label>
+	<label class="personal-page__label _required">
+		<div class="input-title">E-mail для подтвреждения</div>
+		<input
+			value="{{ result['EMAIL'] }}"
+			type="text"
+			class="input personal-page__input"
+			name="email"
+		>
+	</label>
+	<label class="personal-page__label _required">
+		<div class="input-title">Контактный телефон</div>
+		<input
+			value="{{ result['PHONE'] }}"
+			type="text"
+			class="input personal-page__input _phone-mask"
+			name="phone"
+		>
+	</label>
+	<label class="personal-page__label personal-page__label__select _required">
+		<div class="input-title">Город доставки</div>
+		<div class="order-list-select">
+			<select name="city">
+				{% for city in result['CITIES'] %}
+					<option
+					{% if city == result['CITY'] %}selected{% endif %}
+					>{{ city }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</label>
+	<label class="personal-page__label personal-page__label__wide _required">
+		<div class="input-title input-title__socials">Адрес доставки</div>
+		<input
+			placeholder="Укажите адресс доставки"
+			value="{{ result['ADDRESS'] }}"
+			type="text"
+			class="input personal-page__input"
+			name="address"
+		>
+	</label>
+	<div class="personal-page-socials clearfix _required">
+		<div class="input-title">Связанные аккаунты в социальных сетях</div>
+		<script src="//ulogin.ru/js/ulogin.js"></script>
+		<div id="uLogin" data-ulogin="display=buttons;redirect_uri={{ result['ADD_SOCIAL_NETWORK_PATH'] }}">
+			<div
+				class="personal-page-socials-icons"
+				{% if not result['FACEBOOK'] %}
+					data-uloginbutton="facebook"
+				{% endif %}
+				>
+				<div class="social-icon {{ (result['FACEBOOK'])?'social-icon-fb-active':'' }}">
+					<div class="social-icon__svg">
+						{% include '/html/images/svg/facebook.svg' %}
+					</div>
+					<div class="{{ (result['FACEBOOK'])?'social-icon__status-fb':'social-icon__status-vk' }}">
+						<div class="social-icon__status-bcg">
+							{% if result['FACEBOOK'] %}
+								<img src="/html/images/svg/personal-page-check.svg" alt="">
+							{% else %}
+								<img src="/html/images/svg/personal-page-plus.svg" alt="">
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				class="personal-page-socials-icons"
+				{% if not result['VKONTAKTE'] %}
+					data-uloginbutton="vkontakte"
+				{% endif %}
+				>
+				<div class="social-icon {{ (result['VKONTAKTE'])?'social-icon-vk-active':'' }}">
+					<div class="social-icon__svg social-icon-vk">
+						{% include '/html/images/svg/vk.svg' %}
+					</div>
+					<div class="{{ (result['VKONTAKTE'])?'social-icon__status-fb':'social-icon__status-vk' }}">
+						<div class="social-icon__status-bcg">
+							{% if result['VKONTAKTE'] %}
+								<img src="/html/images/svg/personal-page-check.svg" alt="">
+							{% else %}
+								<img src="/html/images/svg/personal-page-plus.svg" alt="">
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				class="personal-page-socials-icons"
+				{% if not result['ODNOKLASSNIKI'] %}
+					data-uloginbutton="odnoklassniki"
+				{% endif %}
+				>
+				<div class="social-icon {{ (result['ODNOKLASSNIKI'])?'social-icon-ok-active':'' }}">
+					<div class="social-icon__svg social-icon-ok">
+						{% include '/html/images/svg/ok.svg' %}
+					</div>
+					<div class="{{ (result['ODNOKLASSNIKI'])?'social-icon__status-fb':'social-icon__status-vk' }}">
+						<div class="social-icon__status-bcg">
+							{% if result['ODNOKLASSNIKI'] %}
+								<img src="/html/images/svg/personal-page-check.svg" alt="">
+							{% else %}
+								<img src="/html/images/svg/personal-page-plus.svg" alt="">
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="personal-page__buttons">
+		<button type="submit" class="t-button-text t-button-bluegradient personal-page__save">Сохранить изменения</button>
+		<button onclick="return profile.cancelEditing(event)" class="t-button-text t-button-blue-border personal-page__cancel">Отменить изменения</button>
+	</div>
+</form>

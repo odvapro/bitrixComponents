@@ -1,0 +1,36 @@
+<div onclick="event.stopPropagation();" class="popup login-popup _loginPopup">
+	<h3 class="login-popup__title">Авторизация</h3>
+	<script src="//ulogin.ru/js/ulogin.js"></script>
+	<div onclick="o2.popups.closePopup();" class="popup-close _popupClose">
+		<div class="svg-close svg-close-dims svg-close__icon"></div>
+	</div>
+	<div
+		id="uLogin"
+		data-ulogin="display=buttons;redirect_uri={{ result['AUTH_PATH'] }}"
+	/>
+		<button
+			type="submit"
+			class="t-button-text login-btn login-btn__fb"
+			data-uloginbutton="facebook"
+		>
+			Войти через Facebook
+		</button>
+		<button
+			type="submit"
+			class="t-button-text login-btn login-btn__vk"
+			data-uloginbutton="vkontakte"
+		>
+			Войти через Вконтакте
+		</button>
+		<button
+			type="submit"
+			class="t-button-text login-btn login-btn__ok"
+			data-uloginbutton="odnoklassniki"
+		>
+			Войти через Однокласники
+		</button>
+	</div>
+	<div class="login-popup__text">
+		Мы зарегестрируем вас сразу после входа через социальную сеть.
+	</div>
+</div>
