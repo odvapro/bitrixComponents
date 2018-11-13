@@ -20,7 +20,7 @@
 			<ul class="sort-items__list-item"><?php
 				for ($arResult['SORTINGS'] as $sortingKey => $sorting)
 				{
-					if (!empty($sorting['selected']))
+					if (empty($sorting['selected']))
 					{
 						?><li><a href="javascript:void(0);" onclick="cSection.setSort('<?=$sortingKey?>');"><?=$sorting['name']?></a></li><?php
 					}

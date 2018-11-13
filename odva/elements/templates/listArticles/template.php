@@ -1,6 +1,6 @@
 <div class="articles-section-items"><?php
 	foreach ($arResult as $element)
-		{
+	{
 		?><div class="help__item articles-item">
 			<div class="help__item-picture">
 				<a href="<?=$element["DETAIL_PAGE_URL"]?>"><img src="<?=$element['PREVIEW_PICTURE']?>" alt=""></a>
@@ -17,9 +17,9 @@
 				</div>
 			</div>
 		</div><?php
-		}
-		else
-		{
+	}
+	else
+	{
 		?><h3 class="text-center">Ничего не найдено</h3><?php
-		}
+	}
 ?></div>

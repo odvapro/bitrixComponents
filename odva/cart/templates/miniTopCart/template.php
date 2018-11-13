@@ -1,6 +1,6 @@
 <div class="top-cart top-cart__notempty <?=($arResult['COUNT'] == 0)?'top-cart__hidden':''?>">
 	<div class="top-cart__icon"><?php
-		include '/html/inc/svg/cart.html';
+		include $_SERVER["DOCUMENT_ROOT"] . '/html/inc/svg/cart.html';
 	?></div>
 	<div class="top-cart__content">
 		<div class="top-cart__content__count">
@@ -18,7 +18,7 @@
 </div>
 <div class="top-cart top-cart__empty <?=($arResult['COUNT'] == 0)?'top-cart__empty__visible':''?>">
 	<div class="top-cart__icon"><?php
-		include '/html/inc/svg/cart-empty.html';
+		include $_SERVER["DOCUMENT_ROOT"].'/html/inc/svg/cart-empty.html';
 	?></div>
 	<div class="top-cart__content">
 		<div class="top-cart__content__count"><span class="md-dn">В вашей корзине</span> нет товаров</div>

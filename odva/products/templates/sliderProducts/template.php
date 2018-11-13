@@ -25,7 +25,7 @@
 								<div class="rec__product-addtocart">
 									<button class="t-button-text t-button-orangegradient">
 										<div class="rec__product-svg"><?php
-											include '/html/inc/svg/cart.html';
+											include $_SERVER["DOCUMENT_ROOT"] . '/html/inc/svg/cart.html';
 										?></div>
 										Добавить в корзину
 									</button>

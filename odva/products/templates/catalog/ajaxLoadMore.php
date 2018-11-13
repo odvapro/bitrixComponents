@@ -1,5 +1,5 @@
 <?php
 foreach ($arResult['PRODUCTS'] as $productKey => $product)
 {
-	include $templateFolder~'/catalog-products-element.php';
+	include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/catalog-products-element.php';
 }

@@ -1,10 +1,10 @@
 <?php
-$bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', {
-	'LINKS' : [
-		{'text' : 'Главная страница','url':'/'},
-		{'text' : $arResult['SECTION']['NAME'],'url':$arResult['SECTION']['SECTION_PAGE_URL']}
+$bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', [
+	'LINKS' => [
+		['text' => 'Главная страница', 'url' => '/'],
+		['text' => $arResult['SECTION']['NAME'],'url' => $arResult['SECTION']['SECTION_PAGE_URL']]
 	]
-})
+]);
 ?><section class="detail">
 	<div class="container">
 		<div class="row">
@@ -112,7 +112,7 @@ $bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', {
 								<div class="detail__product-cartbutton">
 									<button onclick="detailProduct.addCurrentOfferToCart(this)" class="t-button-text t-button-orangegradient">
 										<div class="detail__product-svg"><?php
-											include '/html/src/inc/svg/cart.html';
+											include $_SERVER["DOCUMENT_ROOT"] . '/html/src/inc/svg/cart.html';
 										?></div>
 										<span class="_inCartHtml">Добавить в корзину</span>
 									</button>
@@ -129,7 +129,7 @@ $bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', {
 						<div class="detail__product-cartbutton">
 							<button onclick="detailProduct.addCurrentOfferToCart(this)" class="t-button-text t-button-orangegradient">
 								<div class="detail__product-svg"><?php
-									include '/html/src/inc/svg/cart.html';
+									include $_SERVER["DOCUMENT_ROOT"] . '/html/src/inc/svg/cart.html';
 								?></div>
 								<span class="_inCartHtml">Добавить в корзину</span>
 							</button>
@@ -209,32 +209,32 @@ $bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', {
 						</div><?php
 						if ($arResult['PROPERTIES']['KEIS']['VALUE'])
 						{
-							$keis = $APPLICATION->IncludeComponent('odva:element', 'keisDetail', {
-								'filter':{'IBLOCK_ID':7, 'ID' :$arResult['PROPERTIES']['KEIS']['VALUE'] },
-								'propertiesSettings' : {
-									'PREVIEW_PICTURE' : {
-										'type'  : 'image',
-										'sizes' : {
-											'mini' : {'height' : 308, 'width':313 }
-										}
-									}
-								},
-							});
+							$keis = $APPLICATION->IncludeComponent('odva:element', 'keisDetail', [
+								'filter' => ['IBLOCK_ID' => 7, 'ID' => $arResult['PROPERTIES']['KEIS']['VALUE'] ],
+								'propertiesSettings' => [
+									'PREVIEW_PICTURE' => [
+										'type'  => 'image',
+										'sizes' => [
+											'mini' => ['height' => 308, 'width' => 313 ]
+										]
+									]
+								],
+							]);
 						}
 					?></div><?php
-					$reviews = $APPLICATION->IncludeComponent('odva:elements', 'reviewsProduct', {
-						'filter':{
-							'IBLOCK_ID'        :6,
-							'PROPERTY_PRODUCT' :$arResult['ID']
-						},
-						'count':10
-					});
+					$reviews = $APPLICATION->IncludeComponent('odva:elements', 'reviewsProduct', [
+						'filter' => [
+							'IBLOCK_ID'	=> 6,
+							'PROPERTY_PRODUCT' => $arResult['ID']
+						],
+						'count' => 10
+					]);
 				?></div>
 			</div>
 	</div>
 </section><?php
 // advantages block
-include $templateFolder~'/advantages.php';
+include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/advantages.php';
 ?><script>
 	var detailOffers = <?=$arResult['JSON_OFFERS']?>
 </script>

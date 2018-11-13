@@ -1,27 +1,27 @@
 <?php
 if (count($arResult['PRODUCT_IDS']))
 {
-	 $products = $APPLICATION->IncludeComponent('odva:offers', 'cart', {
-		'productsFilter' : {},
-		'offersFilter' : {
-			'ID':$arResult['PRODUCT_IDS'],
-			'IBLOCK_ID': 5,
-		},
-		'offerPropertiesSettings': {},
-		'productPropertiesSettings': {
-			'PREVIEW_PICTURE' : {
-				'type' : 'image',
-				'sizes' : {
-					'mini' : {'height' : 364, 'width':364 },
-					'medium' : {'height' : 616, 'width':626 }
-				}
-			}
-		},
-		'cartArray' :$arResult['CART_ARRAY'],
-		'count'     :100,
-		'page'      :1,
-		'sort'      :'',
-	})
+	 $products = $APPLICATION->IncludeComponent('odva:offers', 'cart', [
+		'productsFilter' => [],
+		'offersFilter' => [
+			'ID' => $arResult['PRODUCT_IDS'],
+			'IBLOCK_ID' => 5,
+		],
+		'offerPropertiesSettings' => [],
+		'productPropertiesSettings' => [
+			'PREVIEW_PICTURE' => [
+				'type' => 'image',
+				'sizes' => [
+					'mini' => ['height' => 364, 'width' => 364 ],
+					'medium' => ['height' => 616, 'width' => 626 ]
+				]
+			]
+		],
+		'cartArray' => $arResult['CART_ARRAY'],
+		'count'     => 100,
+		'page'      => 1,
+		'sort'      => '',
+	});
 }
 else
 {

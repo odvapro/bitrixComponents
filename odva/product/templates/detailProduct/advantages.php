@@ -12,7 +12,7 @@
 					Мы предлагаем комфортную доставку по всей России
 				</div>
 				<div class="advantages-list__item-chevron"><?php
-					include '/html/images/svg/chevron-orange.svg';
+					include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/chevron-orange.svg';
 				?></div>
 			</li>
 			<li class="advantages-list__item advantages-list__item__quality">
@@ -26,7 +26,7 @@
 					Более 10 лет мы следим за качеством нашей продукции
 				</div>
 				<div class="advantages-list__item-chevron"><?php
-					include '/html/images/svg/chevron-orange.svg';
+					include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/chevron-orange.svg';
 				?></div>
 			</li>
 			<li class="advantages-list__item advantages-list__item__service">
@@ -40,7 +40,7 @@
 					Наши менеджеры работают 12 часов, что бы помочь вам
 				</div>
 				<div class="advantages-list__item-chevron"><?php
-					include '/html/images/svg/chevron-orange.svg';
+					include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/chevron-orange.svg';
 				?></div>
 			</li>
 			<li class="advantages-list__item advantages-list__item__production">
@@ -54,7 +54,7 @@
 					Мы являемся производителем, а не дистрибьютором.
 				</div>
 				<div class="advantages-list__item-chevron"><?php
-					include '/html/images/svg/chevron-orange.svg';
+					include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/chevron-orange.svg';
 				?></div>
 			</li>
 		</ul>

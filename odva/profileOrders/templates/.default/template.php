@@ -27,24 +27,24 @@
 			</div><?php
 			if (count($order['PRODUCT_IDS']))
 			{
-				$products = $APPLICATION->IncludeComponent('odva:offers', 'orderOffers', {
-					'productsFilter' : [],
-					'offersFilter' : {
-						'ID':$order['PRODUCT_IDS']
-					},
-					'offerPropertiesSettings': {},
-					'productPropertiesSettings': {
-						'PREVIEW_PICTURE' : {
-							'type' : 'image',
-							'sizes' : {
-								'mini' : {'height' : 364, 'width':364 },
-								'medium' : {'height' : 616, 'width':626 }
-							}
-						}
-					},
-					'orderProducts':$order['PRODUCTS'],
-					'count' :100,
-				});
+				$products = $APPLICATION->IncludeComponent('odva:offers', 'orderOffers', [
+					'productsFilter' => [],
+					'offersFilter' => [
+						'ID' => $order['PRODUCT_IDS']
+					],
+					'offerPropertiesSettings' => [],
+					'productPropertiesSettings' => [
+						'PREVIEW_PICTURE' => [
+							'type' => 'image',
+							'sizes' => [
+								'mini' => ['height' => 364, 'width' => 364 ],
+								'medium' => ['height' => 616, 'width' => 626 ]
+							]
+						]
+					],
+					'orderProducts' => $order['PRODUCTS'],
+					'count' => 100,
+				]);
 			}
 		?></div><?php
 	}

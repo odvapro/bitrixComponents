@@ -31,7 +31,7 @@
 										data-price="<?=$offer['PRICE']['INT_PRICE']?>"
 									>
 										<div class="rec__product-svg"><?php
-											include '/html/inc/svg/cart.html';
+											include $_SERVER["DOCUMENT_ROOT"] . '/html/inc/svg/cart.html';
 										?></div>
 										<span class="_inCartText">Добавить в корзину</span>
 									</button>

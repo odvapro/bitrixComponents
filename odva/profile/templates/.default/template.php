@@ -70,7 +70,7 @@
 				?>>
 				<div class="social-icon <?=($arResult['FACEBOOK'])?'social-icon-fb-active':'' ?>">
 					<div class="social-icon__svg"><?php
-						include '/html/images/svg/facebook.svg';
+						include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/facebook.svg';
 					?></div>
 					<div class="<?=($arResult['FACEBOOK'])?'social-icon__status-fb':'social-icon__status-vk' ?>">
 						<div class="social-icon__status-bcg"><?php
@@ -95,7 +95,7 @@
 				?>>
 				<div class="social-icon <?=($arResult['VKONTAKTE'])?'social-icon-vk-active':''?>">
 					<div class="social-icon__svg social-icon-vk"><?php
-						include '/html/images/svg/vk.svg';
+						include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/vk.svg';
 					?></div>
 					<div class="<?=($arResult['VKONTAKTE'])?'social-icon__status-fb':'social-icon__status-vk'?>">
 						<div class="social-icon__status-bcg"><?php
@@ -120,7 +120,7 @@
 				?>>
 				<div class="social-icon <?=($arResult['ODNOKLASSNIKI'])?'social-icon-ok-active':''?>">
 					<div class="social-icon__svg social-icon-ok"><?php
-						include '/html/images/svg/ok.svg';
+						include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/ok.svg';
 					?></div>
 					<div class="<?=($arResult['ODNOKLASSNIKI'])?'social-icon__status-fb':'social-icon__status-vk'?>">
 						<div class="social-icon__status-bcg"><?php

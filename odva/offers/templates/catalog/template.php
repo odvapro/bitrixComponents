@@ -2,12 +2,12 @@
 if (count($arResult['OFFERS']) > 0)
 {
 	?><div class="col-lg-9 col-md-9 col-sm-12 catalog-col"><?php
-		include $templateFolder~'/catalog-sorting.php';
+		include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/catalog-sorting.php';
 	?></div>
 
 	<div class="col-lg-9 col-md-9 col-sm-12 catalog-col">
 		<div class="preloader-catalog _catalogPreloader"><?php
-			include '/html/images/svg/loading.svg';
+			include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/loading.svg';
 		?></div>
 		<div class="catalog__items clearfix"><?php
 			foreach ($arResult['OFFERS'] as $offerKey => $offer)
@@ -15,7 +15,7 @@ if (count($arResult['OFFERS']) > 0)
 				if ($offerKey < 6)
 				{
 					$product = $offer['PRODUCT'];
-					include $templateFolder~'/catalog-products-element.php';
+					include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/catalog-products-element.php';
 				}
 			}
 		?></div>
@@ -25,7 +25,7 @@ if (count($arResult['OFFERS']) > 0)
 		$offer = $arResult['SEASON_OFFER'];
 		$product = $offer['PRODUCT'];
 		?><div class="col-lg-9 col-lg-offset-3 col-md-9 col-md-offset-3 col-sm-12 big-product-col"><?php
-			include $templateFolder~'/catalog-product.php';
+			include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/catalog-product.php';
 		?></div><?php
 	}
 	if (count($arResult['OFFERS']) > 6)
@@ -37,7 +37,7 @@ if (count($arResult['OFFERS']) > 0)
 				if ($offerKey > 5)
 				{
 					$product = $offer['PRODUCT'];
-					include $templateFolder~'/catalog-products-element.php';
+					include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/catalog-products-element.php';
 				}
 			}
 			?><div class="_moreProductsPlace"></div>
@@ -46,7 +46,7 @@ if (count($arResult['OFFERS']) > 0)
 			{
 				?><div class="catalog__right-button">
 					<button data-nexpage="2" onclick="cSection.loadMore(this)" class="t-button-text t-button-transparenr catalog__right-refresh">
-						<span class="catalog__refresh"><?php include '/html/images/svg/refresh.svg'?></span>
+						<span class="catalog__refresh"><?php include $_SERVER["DOCUMENT_ROOT"] . '/html/images/svg/refresh.svg'?></span>
 						Показать еще
 					</button>
 				</div><?php

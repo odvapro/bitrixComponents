@@ -6,7 +6,7 @@
 			</div><?php
 			foreach ($arResult['FIELDS'] as $fieldName => $field)
 			{
-				include $templateFolder~'/fieldTypes/'~$field['TYPE']~'.php'
+				include $_SERVER["DOCUMENT_ROOT"] . $templateFolder . '/fieldTypes/' . $field['TYPE'] . '.php'
 			}
 			?><div class="filter__butoon-block">
 				<button

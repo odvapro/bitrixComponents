@@ -28,11 +28,11 @@
 							<div class="cart-section__item-image"><?php
 								if (!empty($product['PREVIEW_PICTURE']['SIZES']['mini']['src']))
 								{
-										?><a href="<?=$product['DETAIL_PAGE_URL']?>"><img src="<?=$product['PREVIEW_PICTURE']['SIZES']['mini']['src']?>" alt="<?=$product['NAME']?>"></a><?php
+									?><a href="<?=$product['DETAIL_PAGE_URL']?>"><img src="<?=$product['PREVIEW_PICTURE']['SIZES']['mini']['src']?>" alt="<?=$product['NAME']?>"></a><?php
 								}
 								else
 								{
-										?><a href="<?=$product['DETAIL_PAGE_URL']?>"><img src="/html/images/noproduct.png" alt="<?=$product['NAME']?>"></a><?php
+									?><a href="<?=$product['DETAIL_PAGE_URL']?>"><img src="/html/images/noproduct.png" alt="<?=$product['NAME']?>"></a><?php
 								}
 							?></div>
 						<div class="cart-section__item-category">Полусинтетические СОЖ</div>

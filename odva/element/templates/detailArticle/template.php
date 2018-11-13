@@ -1,11 +1,11 @@
 <?php
-$bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', {
-	'LINKS' : [
-		{'text' : 'Главная страница','url':'/'},
-		{'text' : 'Полезная информация','url':'/information/'},
-		{'text' : $arResult['NAME'], },
+$bredcrumbs = $APPLICATION->IncludeComponent('odva:breadcrumbs', '', [
+	'LINKS' => [
+		['text' => 'Главная страница','url' => '/'],
+		['text' => 'Полезная информация','url' => '/information/'],
+		['text' => $arResult['NAME'], ],
 	]
-})
+]);
 ?><section class="article-detail">
 	<div class="article-container">
 		<div class="article-detail__title"> <?=$arResult['NAME']?> </div>
