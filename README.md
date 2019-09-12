@@ -1,1 +1,6 @@
-# bitrixComponents
+# Битрикс компоненты компании O₂
+
+- [Список элементов](/odva/elemens/)
+- [Детальная элемента](/odva/element/)
+- [Список разделов](/odva/sections/)
+- [Детальная раздела](/odva/section/)
