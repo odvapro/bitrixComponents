@@ -1,12 +1,13 @@
 # Список элементов
 Пример использования
-```
-<?$APPLICATION->IncludeComponent('odva:elements', '', [
+```php
+<?$APPLICATION->IncludeComponent('odva:elements', 'template'//template -- имя шаблонак компонента
+    ,[
 	'filter' => [
-		'IBLOCK_ID' => 3,
-		'ACTIVE'    => 'Y'
-		# параметры передаются в GetList филтр
+		'IBLOCK_ID' => 3,//номер инфоблока
+		'ACTIVE'    => 'Y'//указавает что доставать из активного инфоблока
+		//параметры передаются в GetList филтр
 	],
-	"count" => 4
+	"count" => 4 // количество элементов которые хотите достать из инфоблока
 ]);?>
 ```
