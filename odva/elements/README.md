@@ -1,7 +1,7 @@
 # Список элементов
 Пример использования
 ```php
-<?$APPLICATION->IncludeComponent('odva:elements', 'template'//template -- имя шаблонак компонента
+<?$APPLICATION->IncludeComponent('odva:elements', 'template'//template -- имя шаблона компонента
     ,[
 	'filter' => [
 		'IBLOCK_ID' => 3,//номер инфоблока
