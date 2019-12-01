@@ -1,11 +1,9 @@
 <?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
-class ProfileOrders extends CBitrixComponent
+class Orders extends CBitrixComponent
 {
-	public function getOrders($userId)
+	public function getOrders($arFilter = [])
 	{
-		$arFilter = ["USER_ID" => $userId];
-
 		$dbSales = CSaleOrder::GetList(["DATE_INSERT" => "DESC"], $arFilter);
 		$orders = [];
 		while ($arSales = $dbSales->Fetch())
@@ -17,6 +15,7 @@ class ProfileOrders extends CBitrixComponent
 			$arSales['FORMAT_DATE_INSERT'] = FormatDate("d.m.Y H:i", MakeTimeStamp($arSales["DATE_INSERT"]));
 			$arSales['PRODUCTS']           = $this->getProducts($arSales['ID']);
 			$arSales['PRODUCT_IDS']        = array_column($arSales['PRODUCTS'], 'PRODUCT_ID');
+			$arSales['PROPERTIES']         = $this->getOrderProps($arSales['ID']);
 			$orders[] = $arSales;
 		}
 		return $orders;
@@ -31,9 +30,10 @@ class ProfileOrders extends CBitrixComponent
 	{
 		$dbItemsInOrder = CSaleBasket::GetList(["ID" => "ASC"], ["ORDER_ID" => $orderId]);
 		$products = [];
-		while ($arItems = $dbItemsInOrder->Fetch())
+		while ($arItem = $dbItemsInOrder->Fetch())
 		{
-			$products[$arItems['PRODUCT_ID']] = $arItems;
+			$arItem['PROPERTIES'] = $this->getProductProps($arItem['ID']);
+			$products[$arItems['PRODUCT_ID']] = $arItem;
 		}
 		return $products;
 	}
@@ -73,5 +73,31 @@ class ProfileOrders extends CBitrixComponent
 		if ($arStatus = CSaleStatus::GetByID($statusCode))
 			return $arStatus['NAME'];
 		return '';
+	}
+
+	/**
+	 * Возвращает все свойства заказа
+	 * @param  int $orderId
+	 * @return array
+	 */
+	public function getOrderProps($orderId)
+	{
+		$orderProps = [];
+		$orderPropsObj = CSaleOrderPropsValue::GetList([], ["ORDER_ID" => $orderId] );
+		while($arVals = $orderPropsObj->Fetch())
+			$orderProps[$arVals['CODE']] = $arVals;
+		return $orderProps;
+	}
+
+	public function getProductProps($orderProductId)
+	{
+		$productProps = [];
+		$db_res = CSaleBasket::GetPropsList(
+			["SORT" => "ASC", "NAME" => "ASC"],
+			["BASKET_ID" => $orderProductId,]
+		);
+		while($ar_res = $db_res->Fetch())
+			$productProps[] = $ar_res;
+		return $productProps;
 	}
 }
