@@ -2,23 +2,30 @@
 
 class Elements extends CBitrixComponent
 {
-	public function getElements($filter,$count = 10)
+	public $pages = [];
+	public function getElements($sort,$filter,$count,$page = 1,$tempPagn = "")
 	{
-		$arSelect = [];
-		$res      = CIBlockElement::GetList([], $filter, false, ["nPageSize"=>$count], $arSelect);
+		if(!isset($page))
+			$page = 1;
+		if(!isset($count))
+			$count = 10;
+		$res      = CIBlockElement::GetList($sort, $filter, false, ["nPageSize"=>$count,"iNumPage"=>$page], []);
 		$elements = [];
 		while($ob = $res->GetNextElement())
 		{
 			$arFields                    = $ob->GetFields();
 			$arFields["PROPERTIES"]      = $ob->getProperties();
-			$arFields["PREVIEW_PICTURE"] = CFile::ResizeImageGet($arFields["PREVIEW_PICTURE"], ['width'=>304, 'height'=>224], BX_RESIZE_IMAGE_PROPORTIONAL, true)['src'];
+			$arFields["PREVIEW_PICTURE"] = CFile::GetPath($arFields["PREVIEW_PICTURE"]);
 			$arFields["SECTION"]         = $this->getSection($arFields['IBLOCK_SECTION_ID']);
 			$elements[]                  = $arFields;
 		}
-		return $elements;
+		$result["ITEMS"] = $elements;
+		if(isset($tempPagn))
+			$result['PAGINATOR'] = $res->GetPageNavStringEx($navComponentObject, 'Заголовок',$tempPagn, 'Y');
+		return $result;
 	}
 
-	/**
+	/**s
 	 * getSection by id
 	 * @param  int $sectionId section id
 	 * @return section info array or false

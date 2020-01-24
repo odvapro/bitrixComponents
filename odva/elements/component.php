@@ -12,9 +12,6 @@ if(!empty($arParams['filter']['SECTION_CODE']))
 $codeIndex = array_search("SECTION_CODE",array_keys($arParams['filter']));
 if($codeIndex !== false)
 	array_splice($arParams['filter'], $codeIndex,1);
-
-$arResult = $this->getElements($arParams['filter'],$arParams['count']);
-
-
+$arResult = $this->getElements($arParams['sort'],$arParams['filter'],$arParams['count'],$arParams['PAGE'],$arParams["TEMPLATE_PAGN"]);
 
 $this->IncludeComponentTemplate();
