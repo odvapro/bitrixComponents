@@ -10,20 +10,10 @@ if(!$USER->IsAuthorized())
 $rsUser = CUser::GetByID($USER->GetID());
 $arUser = $rsUser->Fetch();
 
-$arResult = [
-	'NAME'          => $USER->GetFullName(),
-	'PIC'           => AuthLine::getAvatar(),
-	'EMAIL'         => $USER->GetEmail(),
-	'PHONE'         => $arUser['PERSONAL_PHONE'],
-	'ADDRESS'       => $arUser['PERSONAL_STREET'],
-	'FACEBOOK'      => $arUser['UF_FACEBOOK'],
-	'VKONTAKTE'     => $arUser['UF_VK'],
-	'ODNOKLASSNIKI' => $arUser['UF_OK'],
-	'CITY'          => $arUser['PERSONAL_CITY'],
-	'CITIES'        => $this->getCities(),
-];
+$arResult = $arUser;
 
 $arResult['SAVE_PROFILE_PATH']       = "$componentPath/saveProfile.php";
+$arResult['SAVE_PASSWORD_PATH']       = "$componentPath/savePassword.php";
 $arResult['ADD_SOCIAL_NETWORK_PATH'] = "$componentPath/addSocialNetwork.php";
 
 $this->IncludeComponentTemplate();

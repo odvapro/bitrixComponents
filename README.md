@@ -6,3 +6,4 @@
 - [Список разделов](/odva/sections/)
 - [Детальная раздела](/odva/section/)
 - [Список заказов](/odva/orders/)
+- [Личный кабинет](/odva/profile/)

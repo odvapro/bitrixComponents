@@ -9,7 +9,7 @@ if(!$USER->IsAuthorized())
 	die();
 }
 
-$needFields = ['name', 'email', 'phone', 'city', 'address'];
+$needFields = ['name','lastname','birthday', 'phone', 'city', 'address'];
 foreach ($needFields as $fieldCode)
 {
 	if(empty($_POST[$fieldCode]))
@@ -21,8 +21,8 @@ foreach ($needFields as $fieldCode)
 
 $fields = [
 	"NAME"            => $_POST['name'],
-	"LAST_NAME"       => "",
-	"EMAIL"           => $_POST['email'],
+	"LAST_NAME"       => $_POST['lastname'],
+	"PERSONAL_BIRTHDAY" => $_POST['birthday'],
 	"ACTIVE"          => "Y",
 	"PERSONAL_PHONE"  => $_POST['phone'],
 	"PERSONAL_STREET" => $_POST['address'],
