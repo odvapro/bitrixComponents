@@ -14,5 +14,5 @@ $APPLICATION->IncludeComponent("odva:profile",//имя пространства 
 ```php
 	$arResult['SAVE_PROFILE_PATH']// - путь к файлу для изменения профиля
 	$arResult['SAVE_PASSWORD_PATH']// - путь к файлу для изменения пароля
-	$arResult['ADD_SOCIAL_NETWORK_PATH']// - путь к файлу для изменить соцсети
+	$arResult['ADD_SOCIAL_NETWORK_PATH']// - путь к файлу для измения соцсети
 ```
