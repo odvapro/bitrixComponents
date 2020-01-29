@@ -2,7 +2,7 @@
 
 - пример подключения
 ```php
-$APPLICATION->IncludeComponent("odva:profile",//имся пространстви имен;имя коспонента
+$APPLICATION->IncludeComponent("odva:profile",//имя пространства имен:имя компонента
                                "profile.info",//шаблон копонента
                                []
                            );
