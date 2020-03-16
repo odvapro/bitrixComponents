@@ -2,8 +2,12 @@
 	<?php
 	if($arResult["CURRENT_PAGE"] > 1)
 	{
+		if($arResult["CURRENT_PAGE"] > 2)
+			$prev = $component->replaceUrlTemplate($arResult["CURRENT_PAGE"] - 1);
+		else
+			$prev = $arResult["URL"];
 		?>
-		<a href="<?=$component->replaceUrlTemplate($arResult["CURRENT_PAGE"] - 1)?>" class="g-pagination-button">
+		<a href="<?=$prev?>" class="g-pagination-button">
 			<svg role="img" class="ic-left-arrow ic-pagination">
 				<use xlink:href="#ic-left-arrow"></use>
 			</svg>
@@ -17,7 +21,7 @@
 	?>
 	<div class="pagination__numbers">
 		<a
-			href="<?=$component->replaceUrlTemplate($arResult["URL"])?>"
+			href="<?=$arResult["URL"]?>"
 			class="g-pagination-button pagination__item<?=($arResult['CURRENT_PAGE'] == 1) ? ' pagination__item--active' : ''?>"
 		>1</a>
 
