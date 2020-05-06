@@ -1,0 +1,2 @@
+<script src="//ulogin.ru/js/ulogin.js"></script>
+<div id="uLogin" data-url-file="<?=$arResult['AUTH_SOCIAL_PATH']?>" data-ulogin="display=panel;theme=classic;fields=email,first_name,last_name;providers=vkontakte,facebook;hidden=;redirect_uri=;mobilebuttons=0;callback=auth_with_social;"></div>

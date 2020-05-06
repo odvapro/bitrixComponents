@@ -5,18 +5,15 @@ global $USER;
 // если его нет, то регистрируем его
 // выполняем вход
 // редирект на главную
-
 $s    = file_get_contents('http://ulogin.ru/token.php?token=' . $_POST['token'] . '&host=' . $_SERVER['HTTP_HOST']);
 $user = json_decode($s, true);
 if(!empty($user['error']))
-	LocalRedirect('/');
+	echo json_encode(['success'=>false,'msg'=>$user['error']]);
 
 if($user['network'] == 'facebook')
 	$networkField = ["UF_FACEBOOK" => $user['uid']];
 if($user['network'] == 'vkontakte')
 	$networkField = ["UF_VK" => $user['uid']];
-if($user['network'] == 'odnoklassniki')
-	$networkField = ["UF_OK" => $user['uid']];
 
 $filter  = ["ACTIVE" => "Y"];
 $filter  = array_merge($filter,$networkField);
@@ -25,6 +22,7 @@ if($arUser = $rsUsers->Fetch())
 {
 	// auth
 	$USER->Authorize($arUser['ID']);
+	echo json_encode(['success'=>true,'msg'=>"Вы успешно авторизовались"]);
 }
 else
 {
@@ -44,6 +42,5 @@ else
 	$arFields = array_merge($arFields,$networkField);
 	$ID = $newUser->Add($arFields);
 	$USER->Authorize($ID);
+	echo json_encode(['success'=>true,'msg'=>"Вы успешно Зарегестрировались"]);
 }
-
-LocalRedirect('/');
