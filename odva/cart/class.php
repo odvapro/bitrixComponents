@@ -1,42 +1,60 @@
-<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
-
+<?php
+if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
+CModule::IncludeModule("sale");
+CModule::IncludeModule("catalog");
+use Bitrix\Main,
+Bitrix\Main\Localization\Loc as Loc,
+Bitrix\Main\Loader,
+Bitrix\Main\Config\Option,
+Bitrix\Sale\Delivery,
+Bitrix\Sale\PaySystem,
+Bitrix\Sale,
+Bitrix\Sale\Order,
+Bitrix\Sale\DiscountCouponsManager,
+Bitrix\Main\Context,
+\Odva\Helpers\Basket;
 class Cart extends CBitrixComponent
 {
-	public function getCartFromCookies()
+	public static function getPrice($items)
 	{
-		$cartArray = (!empty($_COOKIE['cart']))?json_decode($_COOKIE['cart'],true):[];
-		return $cartArray;
-	}
-	public function getCartProductIds()
-	{
-		$cartArray = $this->getCartFromCookies();
-		$offerIds = [];
-		foreach ($cartArray as $cartOffer)
+		$basket 	= Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), Bitrix\Main\Context::getCurrent()->getSite());
+		$context 	= new \Bitrix\Sale\Discount\Context\Fuser($basket->getFUserId());
+		$discounts 	= \Bitrix\Sale\Discount::buildFromBasket($basket, $context);
+		$r 			= $discounts->calculate();
+		$result 	= $r->getData();
+		foreach ($result['BASKET_ITEMS'] as $idProduct => $itemPrice)
 		{
-			$offerIds[] = $cartOffer['productId'];
-		}
-		return $offerIds;
+			$value += ($itemPrice['PRICE'] * $items[$idProduct]['QUANTITY']);
+			$priceDiscount += ($itemPrice['DISCOUNT_PRICE'] * $items[$idProduct]['QUANTITY']);
+		};
+		return ['VALUE' => $value,'DISCOUNT'=> $priceDiscount];
 	}
-
-	public function getSumm()
+	public static function getProducts()
 	{
-		$cartArray = $this->getCartFromCookies();
-		$cartSumm = 0;
-		foreach ($cartArray as $cartOffer)
+		$productImtem = Basket::getItems();
+		$result = [];
+		foreach ($productImtem as $productImtem)
 		{
-			$cartSumm += intval($cartOffer['price'])*intval($cartOffer['count']);
+			$item['ID'] 			= $productImtem->getField("ID");
+			$item['NAME'] 			= $productImtem->getField("NAME");
+			$item['PRODUCT_ID'] 	= $productImtem->getField("PRODUCT_ID");
+			$item['BASE_PRICE'] 	= round($productImtem->getField("BASE_PRICE"),0);
+			$item['QUANTITY'] 		= $productImtem->getField("QUANTITY");
+			$result[$item['ID']] 	= $item;
 		}
-		return $cartSumm;
+		return $result;
 	}
-
-	public function getCount()
+	public function executeComponent()
 	{
-		$cartArray = $this->getCartFromCookies();
-		$productsCount = 0;
-		foreach ($cartArray as $cartOffer)
+		$this->arResult['BASE_PRICE']	= Basket::getPrice();
+		$this->arResult['PRODUCTS'] 	= $this->getProducts();
+		$this->arResult['COUNT'] 		= Basket::getCount();
+		if(!empty($this->arResult['PRODUCTS']))
 		{
-			$productsCount += $cartOffer['count'];
+			$this->arResult['PRICE'] = $this->getPrice($this->arResult['PRODUCTS']);
 		}
-		return $productsCount;
+		$this->arResult['PATH_ACTIVATE_RPOMOCOD'] = $this->GetPAth().'/promocod.php';
+		$this->arResult['PATH_GET_ACTUAL_PRICES'] = $this->GetPAth().'/getActualPrices.php';
+		$this->IncludeComponentTemplate();
 	}
 }
