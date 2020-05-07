@@ -1,6 +1,6 @@
 # Компонент смарт фильтр
 
-Пример подключения
+- Пример подключения
 ```php
 	$smartFilterResult = $APPLICATION->IncludeComponent(
 		"odva:smart.filter",
