@@ -18,4 +18,4 @@
 - [Форма odva](/odva/odva.form/)
 - [Продукт](/odva/product/)
 - [Продукты](/odva/products/)
-- [Продукты](/odva/products/)
+- [Форма подписки на рассылки](/odva/subscribe.form/)
