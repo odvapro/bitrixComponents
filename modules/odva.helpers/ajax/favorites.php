@@ -1,11 +1,14 @@
 <?php
-
+//подключаем пролог битрикса(без этого не будуд рабботать основые функций битрикса)
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 
+//подключаю класс для работы с избранным
 use \Odva\Helpers\Favorites;
 
+//проверяю пришло ли вообще какое не будь действие над избранным и проверяю входит ли оно в список доступных действий
 if(empty($_GET['action']) || !in_array($_GET['action'], ['add', 'get', 'delete','deleteAll']))
 {
+	//если нет то формирую ответ с ошибкой и выхожу из скрипта
 	echo json_encode([
 		'success' => false,
 		'error'   => [
@@ -15,25 +18,30 @@ if(empty($_GET['action']) || !in_array($_GET['action'], ['add', 'get', 'delete',
 	]);
 	return;
 }
-
+//в зависимости от того какое действие пришло выполняю соотвествующий метод класса избранного
 switch ($_GET['action'])
 {
+	//в случае если действие добавление в избранное то вызываю метод добавления и передаю туда параметр
+	//id - id елемента инфоблока
 	case 'add':
 		$result = Favorites::add($_GET['id']);
 		break;
-
+	//в случае если действие удаление из избранного то вызываю метод удаление из избранного и передаю туда параметр
+	//id - id елемента инфоблока
 	case 'delete':
 		$result = Favorites::delete($_GET['id']);
 		break;
-
+	//в случае если действие получить все избранные id елементов инфоблока то вызываю метод получения id елементов
 	case 'get':
 		$result = Favorites::get();
 		break;
+	//в случае если действие удалить все избранные id елементов инфоблока то вызываю метод удаления всех id елементов
 	case 'deleteAll':
 		$result = Favorites::deleteAll();
 		break;
 
 	default:
+	//в случае если действия не было в списке то формирую ошибку
 		$result = [
 			'success' => false,
 			'error'   => [
@@ -43,5 +51,5 @@ switch ($_GET['action'])
 		];
 		break;
 }
-
+//вывожу результата работы скрипты
 echo json_encode($result);

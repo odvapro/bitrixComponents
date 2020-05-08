@@ -19,3 +19,4 @@
 - [Продукт](/odva/product/)
 - [Продукты](/odva/products/)
 - [Форма подписки на рассылки](/odva/subscribe.form/)
+- [Оформление заказа](/odva/order.make/)
