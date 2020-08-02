@@ -3,9 +3,20 @@
 	foreach ($arResult['ITEMS'] as $item)
 	{
 		?>
-		<li><pre><?php print_r($item); ?></pre></li>
+		<li><pre><?=$item['ID']?></pre></li>
 		<?php
 	}
 	?>
 </ul>
-<?= $arResult['PAGINATION'] ?>
+<?php
+$APPLICATION->IncludeComponent(
+	"bitrix:main.pagenavigation",
+	"",
+	[
+		"NAV_OBJECT"  => $arResult['NAV_OBJECT'],
+		"SEF_MODE"    => "Y",
+		"PAGE_WINDOW" => 3,
+	],
+	false
+);
+?>

@@ -62,15 +62,36 @@ class Elements extends CBitrixComponent
 
 	public function makeResult()
 	{
-		$rsElements = CIBlockElement::getList(
-			$this->arParams['order'],
-			$this->arParams['filter'],
-			$this->arParams['group'],
-			$this->getNavParams()
-		);
+		$nav = new \Bitrix\Main\UI\PageNavigation($this->arParams['pagn_id']);
+		$nav->initFromUri();
+
+		if(!empty(intval($this->arParams['page'])))
+			if(empty($this->arParams['pagn_id']))
+				$nav->setCurrentPage(intval($this->arParams['page']));
+
+		if(!empty(intval($this->arParams['count'])))
+			$nav->setPageSize(intval($this->arParams['count']));
+		else
+			$nav->setPageSize(0);
+
+		$params = [
+			'filter' => $this->arParams['filter'],
+			'order'  => $this->arParams['sort'],
+			'count_total' => true,
+			'offset' => $nav->getOffset(),
+			'limit' => $nav->getLimit()
+		];
+
+		$rsElements = \Bitrix\Iblock\ElementTable::getList($params);
+
+		$nav->setRecordCount($rsElements->getCount());
+
+		if(empty($nav->getPageSize()))
+				$nav->setPageSize($rsElements->getCount());
+
+		$this->arResult['NAV_OBJECT'] = $nav;
 
 		$this->arResult['ITEMS']      = [];
-		$this->arResult['PAGINATION'] = $this->getPagination($rsElements);
 
 		while($element = $rsElements->Fetch())
 		{
@@ -78,8 +99,6 @@ class Elements extends CBitrixComponent
 
 			if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
 				$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
-
-			$element['PRICE'] = CCatalogProduct::GetOptimalPrice($element['ID']);
 
 			$this->arResult['ITEMS'][$element['ID']] = $element;
 		}
@@ -199,27 +218,6 @@ class Elements extends CBitrixComponent
 		)->Fetch();
 
 		return $this->sections[$id];
-	}
-
-	public function getPagination($dbResult)
-	{
-		if(!array_key_exists('pagn_tpl', $this->arParams))
-			return false;
-
-		return $dbResult->GetPageNavStringEx($navComponentObject, null, $this->arParams['pagn_tpl'], 'Y');
-	}
-
-	public function getNavParams()
-	{
-		$navParams = ['iNumPage' => 1, 'nPageSize' => 0];
-
-		if(!empty($this->arParams['page']) && intval($this->arParams['page']) > 0)
-			$navParams['iNumPage'] = intval($this->arParams['page']);
-
-		if(!empty($this->arParams['count']) && intval($this->arParams['count']) > 0)
-			$navParams['nPageSize'] = intval($this->arParams['count']);
-
-		return $navParams;
 	}
 
 	public function loadProperties()
