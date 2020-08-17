@@ -9,7 +9,7 @@ class Elements extends CBitrixComponent
 
 	public function onPrepareComponentParams($arParams)
 	{
-		if(!\Bitrix\Main\Loader::includeModule("iblock"))
+		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("catalog"))
 			return;
 
 		$defaultParams = [
