@@ -132,7 +132,7 @@ class Elements extends CBitrixComponent
 			);
 		}
 
-		$rsElements = \Bitrix\IblockElementTable::getList($params);
+		$rsElements = \Bitrix\Iblock\ElementTable::getList($params);
 
 		$nav->setRecordCount($rsElements->getCount());
 
