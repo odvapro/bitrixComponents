@@ -32,11 +32,11 @@ class Elements extends CBitrixComponent
 			$arParams['props'] = false;
 
 		if(
-			!array_key_exists('load_price', $arParams)
+			!array_key_exists('price_code', $arParams)
 			||
-			empty($arParams['load_price'])
+			empty($arParams['price_code'])
 		)
-			$arParams['load_price'] = false;
+			$arParams['price_code'] = false;
 
 		if(
 			!array_key_exists('images', $arParams)
@@ -74,15 +74,65 @@ class Elements extends CBitrixComponent
 		else
 			$nav->setPageSize(0);
 
+		if(!$this->arParams['price_code'])
+		{
+			$sortParams   = $this->arParams['sort'];
+			$filterParams = $this->arParams['filter'];
+		}
+		else
+		{
+			$sortParams   = [];
+			$filterParams = [];
+
+			foreach ($this->arParams['sort'] as $paramName => $paramValue)
+			{
+				if($paramName == $this->arParams['price_code'])
+					$sortParams['PRICE.PRICE'] = $paramValue;
+				else
+					$sortParams[$paramName] = $paramValue;
+			}
+
+			foreach ($this->arParams['filter'] as $paramName => $paramValue)
+			{
+				if($paramName == "><{$this->arParams['price_code']}")
+					$filterParams['><PRICE.PRICE'] = $paramValue;
+				else
+					$filterParams[$paramName] = $paramValue;
+			}
+		}
+
 		$params = [
-			'filter' => $this->arParams['filter'],
-			'order'  => $this->arParams['sort'],
+			'filter'      => $filterParams,
+			'order'       => $sortParams,
 			'count_total' => true,
-			'offset' => $nav->getOffset(),
-			'limit' => $nav->getLimit()
+			'offset'      => $nav->getOffset(),
+			'limit'       => $nav->getLimit(),
+			'select'      => ['*']
 		];
 
-		$rsElements = \Bitrix\Iblock\ElementTable::getList($params);
+		if($this->arParams['price_code'])
+		{
+			$params['runtime'] = [
+				new \Bitrix\Main\Entity\ReferenceField(
+					'PRICE',
+					\Bitrix\Catalog\PriceTable::class,
+					// 1 - ID базовой цены (не точно)
+					['=this.ID' => 'ref.PRODUCT_ID', 'ref.CATALOG_GROUP_ID' => [1]]
+				)
+			];
+
+			$params['select'] = array_merge(
+				$params['select'],
+				[
+					'PRICE_ID'               => 'PRICE.ID',
+					'PRICE_PRICE'            => 'PRICE.PRICE',
+					'PRICE_CURRENCY'         => 'PRICE.CURRENCY',
+					'PRICE_CATALOG_GROUP_ID' => 'PRICE.CATALOG_GROUP_ID'
+				]
+			);
+		}
+
+		$rsElements = \Bitrix\IblockElementTable::getList($params);
 
 		$nav->setRecordCount($rsElements->getCount());
 
@@ -100,6 +150,29 @@ class Elements extends CBitrixComponent
 			if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
 				$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
 
+			if($this->arParams['price_code'])
+			{
+				$price = CCatalogProduct::GetOptimalPrice(
+					$element['ID'],
+					1,
+					[],
+					'N',
+					[
+						[
+							'ID'               => $element['PRICE_ID'],
+							'PRICE'            => $element['PRICE_PRICE'],
+							'CURRENCY'         => $element['PRICE_CURRENCY'],
+							'CATALOG_GROUP_ID' => $element['PRICE_CATALOG_GROUP_ID']
+						]
+					]
+				);
+
+				if(empty($price))
+					$element['PRICE'] = false;
+				else
+					$element['PRICE'] = $price['RESULT_PRICE'];
+			}
+
 			$this->arResult['ITEMS'][$element['ID']] = $element;
 		}
 
@@ -108,25 +181,6 @@ class Elements extends CBitrixComponent
 
 		// обработка изображений
 		$this->processImages();
-
-		// подгрузка цен
-		$this->loadPrices();
-	}
-
-	public function loadPrices()
-	{
-		if(!$this->arParams['load_price'])
-			return false;
-
-		foreach ($this->arResult['ITEMS'] as $itemId => $item)
-		{
-			$price = CCatalogProduct::GetOptimalPrice($item['ID']);
-
-			if(empty($price))
-				$this->arResult['ITEMS'][$itemId]['PRICE'] = false;
-			else
-				$this->arResult['ITEMS'][$itemId]['PRICE'] = $price['RESULT_PRICE'];
-		}
 	}
 
 	public function processImages()
