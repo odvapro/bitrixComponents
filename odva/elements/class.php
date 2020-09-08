@@ -4,23 +4,33 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
 class Elements extends CBitrixComponent
 {
-	public $pages    = [];
-	public $sections = [];
+	public $sections        = [];
+	public $defaultPageSize = 20;
 
 	public function onPrepareComponentParams($arParams)
 	{
-		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("catalog"))
-			return;
-
 		$defaultParams = [
 			'sort' => ['SORT' => 'ASC'],
-			'filter' => [],
-			'group' => false
+			'filter' => []
 		];
 
 		foreach($defaultParams as $paramKey => $paramValue)
 			if(!array_key_exists($paramKey, $arParams) || !is_array($arParams[$paramKey]))
 				$arParams[$paramKey] = $paramValue;
+
+		if(!array_key_exists('show_all', $arParams) || !$arParams['show_all'])
+			$arParams['show_all'] = false;
+		else
+			$arParams['show_all'] = true;
+
+		if(!array_key_exists('pagn_id', $arParams) || !is_string($arParams['pagn_id']) || empty($arParams['pagn_id']))
+			$arParams['pagn_id'] = false;
+
+		if(!array_key_exists('count', $arParams) || !is_integer($arParams['count']) || empty($arParams['count']))
+			$arParams['count'] = false;
+
+		if(!array_key_exists('page', $arParams) || !is_integer($arParams['page']) || empty($arParams['page']))
+			$arParams['page'] = false;
 
 		if(
 			!array_key_exists('props', $arParams)
@@ -32,11 +42,13 @@ class Elements extends CBitrixComponent
 			$arParams['props'] = false;
 
 		if(
-			!array_key_exists('price_code', $arParams)
+			!array_key_exists('price_ids', $arParams)
 			||
-			empty($arParams['price_code'])
+			empty($arParams['price_ids'])
+			||
+			!is_array($arParams['price_ids'])
 		)
-			$arParams['price_code'] = false;
+			$arParams['price_ids'] = false;
 
 		if(
 			!array_key_exists('images', $arParams)
@@ -52,173 +64,255 @@ class Elements extends CBitrixComponent
 
 	public function executeComponent()
 	{
-		if(!\Bitrix\Main\Loader::includeModule("iblock"))
+		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("catalog"))
 			return;
 
+		$this->initParams();
 		$this->makeResult();
 
 		$this->IncludeComponentTemplate();
 	}
 
+	private function initParams()
+	{
+		$this->arResult['ITEMS'] = [];
+
+		$this->initSort();
+		$this->initFilter();
+		$this->initNavParams();
+		$this->initSelect();
+	}
+
+	private function initSelect()
+	{
+		$selectParams = ['*'];
+
+		if($this->arParams['price_ids'])
+			foreach ($this->arParams['price_ids'] as $prop)
+				$selectParams = array_merge($selectParams, ["PRICE_{$prop}", "CURRENCY_{$prop}"]);
+
+		$this->arResult['SELECT'] = $selectParams;
+	}
+
+	private function initFilter()
+	{
+		$filterParams = [];
+
+		foreach ($this->arParams['filter'] as $paramName => $paramValue)
+		{
+			if(in_array($paramName, $this->arParams['props']))
+				$filterParams["PROPERTY_{$paramName}"] = $paramValue;
+			else
+				$filterParams[$paramName] = $paramValue;
+		}
+
+		$this->arResult['FILTER'] = $filterParams;
+	}
+
+	private function initSort()
+	{
+		$sortParams   = [];
+
+		foreach ($this->arParams['sort'] as $paramName => $paramValue)
+		{
+			if(in_array($paramName, $this->arParams['props']))
+				$sortParams["PROPERTY_{$paramName}"] = $paramValue;
+			else
+				$sortParams[$paramName] = $paramValue;
+		}
+
+		$this->arResult['SORT'] = $sortParams;
+	}
+
+	private function initNavParams()
+	{
+		$this->arResult['NAV_OBJECT'] = false;
+		$this->arResult['NAV_PARAMS'] = [];
+
+		if($this->arParams['pagn_id'])
+		{
+			$this->arResult['NAV_OBJECT'] = new \Bitrix\Main\UI\PageNavigation($this->arParams['pagn_id']);
+			$this->arResult['NAV_OBJECT']->initFromUri();
+
+			if($this->arParams['count'])
+				$this->arResult['NAV_OBJECT']->setPageSize($this->arParams['count']);
+			else
+				$this->arResult['NAV_OBJECT']->setPageSize($this->defaultPageSize);
+
+			$this->arResult['NAV_PARAMS'] = [
+				'iNumPage'  => $this->arResult['NAV_OBJECT']->getCurrentPage(),
+				'nPageSize' => $this->arResult['NAV_OBJECT']->getPageSize(),
+			];
+		}
+		else
+		{
+			if($this->arParams['page'])
+			{
+				$this->arResult['NAV_PARAMS'] = [
+					'iNumPage'  => $this->arParams['page'],
+					'nPageSize' => $this->arParams['count'] ?: 20,
+				];
+			}
+			else
+			{
+				if($this->arParams['count'])
+					$this->arResult['NAV_PARAMS'] = ['nTopCount' => $this->arParams['count']];
+				else
+				{
+					if($this->arParams['show_all'])
+						$this->arResult['NAV_PARAMS'] = [];
+					else
+						$this->arResult['NAV_PARAMS'] = ['nTopCount' => 20];
+				}
+			}
+		}
+	}
+
 	public function makeResult()
 	{
-		$nav = new \Bitrix\Main\UI\PageNavigation($this->arParams['pagn_id']);
-		$nav->initFromUri();
+		$rsElements = CIBlockElement::GetList(
+			$this->arResult['SORT'],
+			$this->arResult['FILTER'],
+			false,
+			$this->arResult['NAV_PARAMS'],
+			$this->arResult['SELECT']
+		);
 
-		if(!empty(intval($this->arParams['page'])))
-			if(empty($this->arParams['pagn_id']))
-				$nav->setCurrentPage(intval($this->arParams['page']));
-
-		if(!empty(intval($this->arParams['count'])))
-			$nav->setPageSize(intval($this->arParams['count']));
-		else
-			$nav->setPageSize(0);
-
-		if(!$this->arParams['price_code'])
-		{
-			$sortParams   = $this->arParams['sort'];
-			$filterParams = $this->arParams['filter'];
-		}
-		else
-		{
-			$sortParams   = [];
-			$filterParams = [];
-
-			foreach ($this->arParams['sort'] as $paramName => $paramValue)
-			{
-				if($paramName == $this->arParams['price_code'])
-					$sortParams['PRICE.PRICE'] = $paramValue;
-				else
-					$sortParams[$paramName] = $paramValue;
-			}
-
-			foreach ($this->arParams['filter'] as $paramName => $paramValue)
-			{
-				if($paramName == "><{$this->arParams['price_code']}")
-					$filterParams['><PRICE.PRICE'] = $paramValue;
-				else
-					$filterParams[$paramName] = $paramValue;
-			}
-		}
-
-		$params = [
-			'filter'      => $filterParams,
-			'order'       => $sortParams,
-			'count_total' => true,
-			'offset'      => $nav->getOffset(),
-			'limit'       => $nav->getLimit(),
-			'select'      => ['*']
-		];
-
-		if($this->arParams['price_code'])
-		{
-			$params['runtime'] = [
-				new \Bitrix\Main\Entity\ReferenceField(
-					'PRICE',
-					\Bitrix\Catalog\PriceTable::class,
-					// 1 - ID базовой цены (не точно)
-					['=this.ID' => 'ref.PRODUCT_ID', 'ref.CATALOG_GROUP_ID' => [1]]
-				)
-			];
-
-			$params['select'] = array_merge(
-				$params['select'],
-				[
-					'PRICE_ID'               => 'PRICE.ID',
-					'PRICE_PRICE'            => 'PRICE.PRICE',
-					'PRICE_CURRENCY'         => 'PRICE.CURRENCY',
-					'PRICE_CATALOG_GROUP_ID' => 'PRICE.CATALOG_GROUP_ID'
-				]
-			);
-		}
-
-		$rsElements = \Bitrix\Iblock\ElementTable::getList($params);
-
-		$nav->setRecordCount($rsElements->getCount());
-
-		if(empty($nav->getPageSize()))
-				$nav->setPageSize($rsElements->getCount());
-
-		$this->arResult['NAV_OBJECT'] = $nav;
-
-		$this->arResult['ITEMS']      = [];
+		if($this->arParams['pagn_id'])
+			$this->arResult['NAV_OBJECT']->setRecordCount($rsElements->SelectedRowsCount());
 
 		while($element = $rsElements->Fetch())
-		{
-			$element['PROPERTIES'] = [];
+			$this->arResult['ITEMS'][$element['ID']] = $this->processElement($element);
 
-			if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
-				$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
+		unset($this->sections);
 
-			if($this->arParams['price_code'])
-			{
-				$price = CCatalogProduct::GetOptimalPrice(
-					$element['ID'],
-					1,
-					[],
-					'N',
-					[
-						[
-							'ID'               => $element['PRICE_ID'],
-							'PRICE'            => $element['PRICE_PRICE'],
-							'CURRENCY'         => $element['PRICE_CURRENCY'],
-							'CATALOG_GROUP_ID' => $element['PRICE_CATALOG_GROUP_ID']
-						]
-					]
-				);
-
-				if(empty($price))
-					$element['PRICE'] = false;
-				else
-					$element['PRICE'] = $price['RESULT_PRICE'];
-			}
-
-			$this->arResult['ITEMS'][$element['ID']] = $element;
-		}
-
-		// подгрузка свойств
 		$this->loadProperties();
-
-		// обработка изображений
-		$this->processImages();
 	}
 
-	public function processImages()
+	private function processElement($element)
 	{
-		if(!$this->arParams['images'])
+		if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
+			$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
+
+		// подгрузка путей изображений в поля типа DETAIL_PICTURE и PREVIEW_PICTURE
+		if($this->arParams['images'])
+			foreach ($this->arParams['images'] as $imagePropCode => $variants)
+				if(array_key_exists($imagePropCode, $element))
+					$element[$imagePropCode] = $this->processImageProp($imagePropCode, $element[$imagePropCode]);
+
+		// перенос цен в общий массив, при необходимости подгрузка скидок
+		$this->processPrices($element);
+
+		return $element;
+	}
+
+	public function processPrices(&$element)
+	{
+		if(!$this->arParams['price_ids'])
 			return;
 
-		foreach ($this->arResult['ITEMS'] as $itemId => $item)
+		$arDiscounts = false;
+
+		foreach ($this->arParams['price_ids'] as $priceId)
 		{
-			foreach ($this->arParams['images'] as $propCode => $variants)
+			$priceKey    = "PRICE_{$priceId}";
+			$currencyKey = "CURRENCY_{$priceId}";
+
+			if(!array_key_exists($priceKey, $element))
+				continue;
+
+			$price = [
+				'PRICE'    => $element[$priceKey],
+				'CURRENCY' => $element[$currencyKey]
+			];
+
+			unset($element[$priceKey], $element[$currencyKey]);
+
+			if(!$this->arParams['load_discounts'])
 			{
-				if($propCode == 'DETAIL_PICTURE' || $propCode == 'PREVIEW_PICTURE')
-					$imageId = $item[$propCode];
-				else
-					$imageId = $item['PROPERTIES'][$propCode]['VALUE'];
-
-				if(is_array($imageId))
-				{
-					$imageData = [];
-
-					foreach ($imageId as $id)
-						$imageData[] = $this->getImageData($itemId, $id, $propCode, $variants);
-				}
-				else
-				{
-					$imageData = $this->getImageData($itemId, $imageId, $propCode, $variants);
-				}
-
-				$this->setImageValue($itemId, $propCode, $imageData);
+				$element['PRICES'][$priceKey] = $price;
+				continue;
 			}
+
+			global $USER;
+
+			if($arDiscounts === false)
+				$arDiscounts = CCatalogDiscount::GetDiscountByProduct($element['ID'], $USER->GetUserGroupArray(), "N");
+
+			if(empty($arDiscounts))
+			{
+				$element['PRICES'][$priceKey] = $price;
+				continue;
+			}
+
+			$discountPrice = CCatalogProduct::CountPriceWithDiscount(
+				$price['PRICE'],
+				$price['CURRENCY'],
+				$arDiscounts
+			);
+
+			$price['OLD_PRICE'] = $price['PRICE'];
+			$price['PRICE']     = $discountPrice;
+			$price['DISCOUNT']  = [
+				'PERCENT' => ($price['OLD_PRICE'] - $price['PRICE']) / $price['OLD_PRICE'] * 100,
+				'VALUE'   => $price['OLD_PRICE'] - $price['PRICE']
+			];
+
+			$element['PRICES'][$priceKey] = $price;
 		}
 	}
 
-	private function getImageData($itemId, $imageId, $propCode, $variants)
+	private function loadProperties()
 	{
-		if(empty($imageId) || !is_numeric($imageId))
+		if(empty($this->arParams['props']))
+			return;
+
+		$properties = array_fill_keys(array_column($this->arResult['ITEMS'], 'ID'), []);
+
+		CIBlockElement::GetPropertyValuesArray($properties, 7, [], ['CODE' => $this->arParams['props']]);
+
+		foreach ($properties as $elementId => $propsArr)
+		{
+			if($this->arParams['images'])
+			{
+				foreach ($propsArr as $propCode => $prop)
+				{
+					if(array_key_exists($propCode, $this->arParams['images']))
+					{
+						$propsArr[$propCode]['VALUE'] = $this->processImageProp($propCode, $propsArr[$propCode]['VALUE']);
+					}
+				}
+			}
+
+			$this->arResult['ITEMS'][$elementId]['PROPERTIES'] = $propsArr;
+		}
+	}
+
+	private function processImageProp($propCode, $realValue)
+	{
+		if(!array_key_exists($propCode, $this->arParams['images']))
 			return false;
 
+		if(empty($realValue))
+			return $realValue;
+
+		$variants = $this->arParams['images'][$propCode];
+
+		if(is_array($realValue))
+		{
+			$imageData = [];
+
+			foreach ($realValue as $id)
+				$imageData[] = $this->getImageData($id, $variants);
+		}
+		else
+			$imageData = $this->getImageData($realValue, $variants);
+
+		return $imageData;
+	}
+
+	private function getImageData($imageId, $variants)
+	{
 		// $variants обязательно ассоциативный массив
 		if(array_keys($variants) === range(0, count($variants) - 1))
 			return false;
@@ -248,15 +342,7 @@ class Elements extends CBitrixComponent
 		return $prop;
 	}
 
-	private function setImageValue($itemId, $propCode, $value)
-	{
-		if($propCode == 'DETAIL_PICTURE' || $propCode == 'PREVIEW_PICTURE')
-			$this->arResult['ITEMS'][$itemId][$propCode] = $value;
-		else
-			$this->arResult['ITEMS'][$itemId]['PROPERTIES'][$propCode]['VALUE'] = $value;
-	}
-
-	public function getSection($id, $iblockId)
+	private function getSection($id, $iblockId)
 	{
 		if(array_key_exists($id, $this->sections))
 			return $this->sections[$id];
@@ -272,24 +358,5 @@ class Elements extends CBitrixComponent
 		)->Fetch();
 
 		return $this->sections[$id];
-	}
-
-	public function loadProperties()
-	{
-		if(
-			is_array($this->arParams['props'])
-			&&
-			!empty($this->arParams['props'])
-			&&
-			!empty($this->arParams['filter']['IBLOCK_ID'])
-		)
-		{
-			CIBlockElement::GetPropertyValuesArray(
-				$this->arResult['ITEMS'],
-				$this->arParams['filter']['IBLOCK_ID'],
-				$this->arParams['filter'],
-				['CODE' => $this->arParams['props']]
-			);
-		}
 	}
 }
