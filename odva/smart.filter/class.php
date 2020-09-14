@@ -171,8 +171,6 @@ class SmartFilter extends CBitrixComponent
 			!empty($this->arParams['PRICE'])
 			&&
 			!empty($this->arParams['PRICE']['FIELD'])
-			&&
-			array_key_exists($this->arParams['PRICE']['FIELD'], $parsedFilter)
 		)
 		{
 			$this->addFieldClass(
