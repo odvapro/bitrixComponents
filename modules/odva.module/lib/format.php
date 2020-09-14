@@ -1,8 +1,8 @@
 <?php
 
-namespace Odva\Helpers;
+namespace Odva\Module;
 //класс для форматирования
-class Formatters
+class Format
 {
 	//форматирования цены
 	public function price($price, int $decimals = 2, string $dec_point = "." , string $thousands_sep = " ")
