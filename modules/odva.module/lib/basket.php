@@ -1,24 +1,73 @@
 <?php
 
-//обозначаем простарство имен модуля
 namespace Odva\Module;
 
-//подключаем классы работы с модулями и модуль для работы с интернет-магазином
 use \Bitrix\Sale;
 use \Bitrix\Main\Error;
 use \Bitrix\Main\Loader;
+use \Bitrix\Sale\Discount;
+use \Bitrix\Sale\Discount\Context\Fuser;
 
-//подключаем моудли для работы с интернет-магазином и моудль для работы с каталогом
 Loader::includeModule("sale");
 Loader::includeModule("catalog");
 
-//объявляем класс для работы с корзиной
+/**
+ * класс для работы с корзиной
+ */
 class Basket
 {
+	/**
+	 * статический объект корзины
+	 * @var \Bitrix\Sale\Basket
+	 */
 	public static $basket = false;
 
 	/**
+	 * полная информация о корзине -
+	 * список продуктов, цены и количество
+	 *
+	 * @return array ['PRODUCTS', 'PRICE', 'COUNT']
+	 */
+	public function getInfo()
+	{
+		return [
+			'PRODUCTS' => self::getItemsArray(),
+			'COUNT'    => self::getCount(),
+			'PRICE'    => self::getPrice()
+		];
+	}
+
+	/**
+	 * список продуктов корзины в виде массива
+	 * @return array
+	 */
+	public function getItemsArray()
+	{
+		$basketItems = self::getItemsObject();
+		$result      = [];
+
+		foreach ($basketItems as $basketItem)
+		{
+			$item = [];
+
+			$item['ID']               = $basketItem->getId();
+			$item['NAME']             = $basketItem->getField('NAME');
+			$item['PRODUCT_ID']       = $basketItem->getProductId();
+			$item['BASE_PRICE']       = round($basketItem->getBasePrice(), 0);
+			$item['DISCOUNT_PRICE']   = round($basketItem->getDiscountPrice(), 0);
+			$item['DISCOUNT_PERCENT'] = round(($basketItem->getDiscountPrice() * 100 / $basketItem->getBasePrice()), 0);
+			$item['PRICE']            = round($basketItem->getPrice(), 0);
+			$item['QUANTITY']         = $basketItem->getQuantity();
+
+			$result[$item['ID']] 	= $item;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * возвращает коллекцию элементов корзины в виде объекта
+	 * @return \Bitrix\Sale\BasketItemCollection
 	 */
 	public static function getItemsObject()
 	{
@@ -28,6 +77,7 @@ class Basket
 
 	/**
 	 * возвращает количество елементов в корзине
+	 * @return array ['ITEMS' => int, 'PRODUCTS' => int]
 	 */
 	public function getCount()
 	{
@@ -40,21 +90,23 @@ class Basket
 
 	/**
 	 * достает цену корзины
+	 * @return array ['BASE' => int, 'PRICE' => int]
 	 */
 	public function getPrice()
 	{
 		$basket = self::getBasket();
+
 		return [
-			'BASE'  => $basket->getBasePrice(),
-			'PRICE' => $basket->getPrice()
+			'BASE'     => $basket->getBasePrice(),
+			'PRICE'    => $basket->getPrice()
 		];
 	}
 
 	/**
-	 * метод класса котоый добавляет количество товара в корзине
+	 * добавляет в корзину указанный товар в указанном количестве
 	 *
-	 * @param int $productId id продукта
-	 * @param int $quantity количество, может быть как положительным, так и отрицательным
+	 * @param int $productId ID продукта
+	 * @param int $quantity количество
 	 */
 	public function addItem($productId, $quantity)
 	{
@@ -136,8 +188,20 @@ class Basket
 
 	public function getBasket()
 	{
-		if(self::$basket === false)
-			self::$basket = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID);
+		if(self::$basket !== false)
+			return self::$basket;
+
+		$basket    = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID);
+
+		$context   = new \Bitrix\Sale\Discount\Context\Fuser($basket->getFUserId());
+		$discounts = \Bitrix\Sale\Discount::buildFromBasket($basket, $context);
+		$result    = $discounts->calculate()->getData();
+
+		if(array_key_exists('BASKET_ITEMS', $result))
+			$basket->applyDiscount($result['BASKET_ITEMS']);
+
+		self::$basket = $basket;
+
 		return self::$basket;
 	}
 
@@ -150,5 +214,25 @@ class Basket
 	{
 		$basket = self::getBasket();
 		return $basket->getExistsItem('catalog', $productId);
+	}
+
+	/**
+	 * применение купона
+	 * @param  string купон
+	 * @return boolean
+	 */
+	public function applyCoupon($coupon)
+	{
+		return \Bitrix\Sale\DiscountCouponsManager::add($coupon);
+	}
+
+	/**
+	 * отмена купона
+	 * @param  string купон
+	 * @return boolean
+	 */
+	public function deleteCoupon($coupon)
+	{
+		return \Bitrix\Sale\DiscountCouponsManager::delete($coupon);
 	}
 }

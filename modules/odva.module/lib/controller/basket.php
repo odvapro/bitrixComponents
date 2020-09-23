@@ -15,7 +15,27 @@ class Basket extends Controller
 			'changeItemQuantity' => ['prefilters' => []],
 			'clear'              => ['prefilters' => []],
 			'getCount'           => ['prefilters' => []],
+			'applyCoupon'        => ['prefilters' => []],
+			'deleteCoupon'       => ['prefilters' => []],
+			'getInfo'            => ['prefilters' => []],
 		];
+	}
+
+	public function applyCouponAction($coupon='')
+	{
+		\Odva\Module\Basket::applyCoupon($coupon);
+		return \Odva\Module\Basket::getInfo();
+	}
+
+	public function deleteCouponAction($coupon='')
+	{
+		\Odva\Module\Basket::deleteCoupon($coupon);
+		return \Odva\Module\Basket::getInfo();
+	}
+
+	public function getInfoAction()
+	{
+		return \Odva\Module\Basket::getInfo();
 	}
 
 	public function getCountAction()

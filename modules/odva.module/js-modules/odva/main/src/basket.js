@@ -44,6 +44,27 @@ class OdvaBasket extends Observer
 		return response;
 	}
 
+	async applyCoupon(coupon)
+	{
+		let response = await this.getResponse('applyCoupon', {coupon: coupon});
+		this.notify('applyCoupon', response);
+		return response;
+	}
+
+	async deleteCoupon(coupon)
+	{
+		let response = await this.getResponse('deleteCoupon', {coupon: coupon});
+		this.notify('deleteCoupon', response);
+		return response;
+	}
+
+	async getInfo()
+	{
+		let response = await this.getResponse('getInfo');
+		this.notify('getInfo', response);
+		return response;
+	}
+
 	async getResponse(action, data = {}, config)
 	{
 		let defaultConfig = {
