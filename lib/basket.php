@@ -195,10 +195,14 @@ class Basket
 
 		$context   = new \Bitrix\Sale\Discount\Context\Fuser($basket->getFUserId());
 		$discounts = \Bitrix\Sale\Discount::buildFromBasket($basket, $context);
-		$result    = $discounts->calculate()->getData();
 
-		if(array_key_exists('BASKET_ITEMS', $result))
-			$basket->applyDiscount($result['BASKET_ITEMS']);
+		if(!empty($discounts))
+		{
+			$result = $discounts->calculate()->getData();
+
+			if(array_key_exists('BASKET_ITEMS', $result))
+				$basket->applyDiscount($result['BASKET_ITEMS']);
+		}
 
 		self::$basket = $basket;
 
