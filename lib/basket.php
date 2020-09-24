@@ -53,10 +53,10 @@ class Basket
 			$item['ID']               = $basketItem->getId();
 			$item['NAME']             = $basketItem->getField('NAME');
 			$item['PRODUCT_ID']       = $basketItem->getProductId();
-			$item['BASE_PRICE']       = round($basketItem->getBasePrice(), 0);
-			$item['DISCOUNT_PRICE']   = round($basketItem->getDiscountPrice(), 0);
+			$item['BASE_PRICE']       = number_format($basketItem->getBasePrice(), 2, '.', '');
+			$item['DISCOUNT_PRICE']   = number_format($basketItem->getDiscountPrice(), 2, '.', '');
 			$item['DISCOUNT_PERCENT'] = round(($basketItem->getDiscountPrice() * 100 / $basketItem->getBasePrice()), 0);
-			$item['PRICE']            = round($basketItem->getPrice(), 0);
+			$item['PRICE']            = number_format($basketItem->getPrice(), 2, '.', '');
 			$item['QUANTITY']         = $basketItem->getQuantity();
 
 			$result[$item['ID']] 	= $item;
