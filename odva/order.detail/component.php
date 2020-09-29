@@ -22,7 +22,7 @@ $result = [];
 			$item['QUANTITY'] 		= $productImtem->getField("QUANTITY");
 			$item['BASE_PRICE'] 	= $productImtem->getField("BASE_PRICE");
 			$item['DETAIL_PAGE_URL']= $productImtem->getField("DETAIL_PAGE_URL");
-			$res = CIBlockElement::GetList([], ['ID'=>$item['PRODUCT_ID'], 'IBLOCK_ID'=>'22'], false, [], []);
+			$res = CIBlockElement::GetList([], ['ID'=>$item['PRODUCT_ID']], false, [], []);
 			$ob = $res->GetNextElement();
 			$item['IMG'] 			= CFile::GetPath($ob->GetFields()['PREVIEW_PICTURE']);
 			if(!$item['IMG'])
