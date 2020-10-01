@@ -106,7 +106,7 @@ class OrderDetail extends \CBitrixComponent
 			$this->arResult['PRODUCTS'][$product['ID']] = $product;
 		}
 
-		if($this->arParams['product_fields'] || $this->arParams['product_properties'])
+		if($this->arParams['product_fields'] || $this->arParams['product_properties'] || $this->arParams['images'])
 			$this->loadProperties($productId);
 
 		$this->includeComponentTemplate();
