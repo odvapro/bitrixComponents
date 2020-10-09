@@ -2,6 +2,25 @@
 
 class Profile extends CBitrixComponent
 {
+	public function executeComponent()
+	{
+		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("sale"))
+			return;
+
+		global $USER;
+		if(!$USER->IsAuthorized())
+			LocalRedirect('/');
+		$rsUser = CUser::GetByID($USER->GetID());
+		$arUser = $rsUser->Fetch();
+
+		$this->arResult = $arUser;
+
+		$this->arResult['SAVE_PROFILE_PATH']       = $this->getPath()."/saveProfile.php";
+		$this->arResult['SAVE_PASSWORD_PATH']      = $this->getPath()."/savePassword.php";
+		$this->arResult['ADD_SOCIAL_NETWORK_PATH'] = $this->getPath()."/addSocialNetwork.php";
+
+		$this->IncludeComponentTemplate();
+	}
 	public function getCities()
 	{
 		$cities = [];
