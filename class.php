@@ -2,6 +2,15 @@
 
 class Sections extends CBitrixComponent
 {
+	public function executeComponent()
+	{
+		if(!\Bitrix\Main\Loader::includeModule("iblock"))
+			return;
+
+		$this->getSections($this->arParams['filter'], $this->arParams["count"]);
+
+		$this->IncludeComponentTemplate();
+	}
 	public function getSections($filter, $count = 10)
 	{
 		$arSelect = [];
@@ -14,7 +23,7 @@ class Sections extends CBitrixComponent
 			$arFields['ELEMENTS_COUNT'] = $this->formatProductsCount($arFields['ELEMENT_CNT']);
 			$sections[]          = $arFields;
 		}
-		return $sections;
+		$this->arResult["SECTIONS"] = $sections;
 	}
 
 	public function formatProductsCount($count)
