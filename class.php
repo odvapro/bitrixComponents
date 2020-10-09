@@ -2,9 +2,12 @@
 
 class Orders extends CBitrixComponent
 {
-	public function getOrders($arFilter = [])
+	public function executeComponent()
 	{
-		$dbSales = CSaleOrder::GetList(["DATE_INSERT" => "DESC"], $arFilter);
+		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::IncludeModule("sale"))
+			return;
+
+		$dbSales = CSaleOrder::GetList(["DATE_INSERT" => "DESC"], $this->arParams['filter']);
 		$orders = [];
 		while ($arSales = $dbSales->Fetch())
 		{
@@ -18,7 +21,8 @@ class Orders extends CBitrixComponent
 			$arSales['PROPERTIES']         = $this->getOrderProps($arSales['ID']);
 			$orders[] = $arSales;
 		}
-		return $orders;
+		$this->arResult['ORDERS'] =$orders;
+		$this->includeComponentTemplate();
 	}
 
 	/**
