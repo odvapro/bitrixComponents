@@ -4,9 +4,14 @@
 	</div>
 	<div class="articles-category-list">
 		<ul>
-			{% for section in result["SECTIONS"] %}
-				<li><a href="{{ section['SECTION_PAGE_URL'] }}">{{ section['NAME'] }}</a></li>
-			{% endfor %}
+		<?php
+		foreach ($variable as $key => $value)
+		{
+		?>
+			<li><a href="<?=$section['SECTION_PAGE_URL']?>"><?=$section['NAME']?></a></li>
+		<?php
+		}
+		?>
 		</ul>
 	</div>
 </div>
