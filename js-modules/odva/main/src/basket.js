@@ -1,5 +1,8 @@
 import Observer from './core/observer';
 
+/**
+ * класс для работы с корзиной
+ */
 class OdvaBasket extends Observer
 {
 	constructor()
@@ -9,6 +12,11 @@ class OdvaBasket extends Observer
 		this.eventScope = 'basket';
 	}
 
+	/**
+	 * получение количества товаров в корзине
+	 *
+	 * @return {Array} ['PRODUCTS' => number, 'ITEMS' => number]
+	 */
 	async getCount()
 	{
 		let response = await this.getResponse('getCount', false, {method: 'GET'});
@@ -16,6 +24,9 @@ class OdvaBasket extends Observer
 		return response;
 	}
 
+	/**
+	 * удаление всех товаров из корзины
+	 */
 	async clear()
 	{
 		let response = await this.getResponse('clear', false, {method: 'GET'});
@@ -23,6 +34,12 @@ class OdvaBasket extends Observer
 		return response;
 	}
 
+	/**
+	 * добавление товара в корзину
+	 *
+	 * @param {number} productId ID товара
+	 * @param {number} quantity количество товара
+	 */
 	async addItem(productId, quantity)
 	{
 		let response = await this.getResponse('addItem', {productId: productId, quantity: quantity});
@@ -30,6 +47,11 @@ class OdvaBasket extends Observer
 		return response;
 	}
 
+	/**
+	 * удаление товара из корзины
+	 *
+	 * @param {number} productId ID товара
+	 */
 	async deleteItem(productId)
 	{
 		let response = await this.getResponse('deleteItem', {productId: productId});
@@ -37,6 +59,12 @@ class OdvaBasket extends Observer
 		return response;
 	}
 
+	/**
+	 * изменение количества товара в корзине
+	 *
+	 * @param {number} productId ID товара
+	 * @param {number} quantity количество товара (может быть как положительным, так и отрицательным)
+	 */
 	async changeItemQuantity(productId, quantity)
 	{
 		let response = await this.getResponse('changeItemQuantity', {productId: productId, quantity: quantity});

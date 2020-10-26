@@ -1,4 +1,7 @@
-export default class Observer
+/**
+ * класс для реализации шаблона проектирования "Наблюдатель"
+ */
+class Observer
 {
 	constructor()
 	{
@@ -6,6 +9,9 @@ export default class Observer
 		this.eventScope  = 'default';
 	}
 
+	/**
+	 * метод подписки на события
+	 */
 	subscribe(obj)
 	{
 		for(let subscriber of this.subscribers)
@@ -15,11 +21,17 @@ export default class Observer
 		this.subscribers.push(obj);
 	}
 
+	/**
+	 * метод отписки от событий
+	 */
 	unsubscribe(obj)
 	{
 		this.subscribers = this.subscribers.filter(subscriber => subscriber !== obj);
 	}
 
+	/**
+	 * оповещение о новом событии подписчиков
+	 */
 	notify(eventType, data)
 	{
 		let event = this.getEventHandlerName(eventType);
@@ -34,3 +46,5 @@ export default class Observer
 		return `${this.eventScope}${eventType}Event`;
 	}
 }
+
+export default Observer;

@@ -1,0 +1,1 @@
+<?php require $_SERVER["DOCUMENT_ROOT"] . '/local/modules/odva.module/admin/global_site_settings.php'; ?>
