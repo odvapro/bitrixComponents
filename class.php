@@ -264,12 +264,17 @@ class Elements extends CBitrixComponent
 
 	private function loadProperties()
 	{
-		if(empty($this->arParams['props']))
+		if(empty($this->arParams['props']) || empty($this->arResult['ITEMS']))
 			return;
 
 		$properties = array_fill_keys(array_column($this->arResult['ITEMS'], 'ID'), []);
 
-		CIBlockElement::GetPropertyValuesArray($properties, 7, [], ['CODE' => $this->arParams['props']]);
+		$firstItem = current(array_values($this->arResult['ITEMS']));
+
+		if(!array_key_exists('IBLOCK_ID', $firstItem))
+			return;
+
+		CIBlockElement::GetPropertyValuesArray($properties, $firstItem['IBLOCK_ID'], [], ['CODE' => $this->arParams['props']]);
 
 		foreach ($properties as $elementId => $propsArr)
 		{
