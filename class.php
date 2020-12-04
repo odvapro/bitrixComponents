@@ -22,13 +22,17 @@ class Element extends \CBitrixComponent
 
 		if(!array_key_exists('id', $params) && !array_key_exists('code', $params))
 		{
-			$this->errorCollection->setError(new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT));
+			$this->errorCollection->setError(
+				new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT)
+			);
 			return $params;
 		}
 
 		if(array_key_exists('id', $params) && ((int)$params['id'] <= 0 || (int)$params['id'] != $params['id']))
 		{
-			$this->errorCollection->setError(new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT));
+			$this->errorCollection->setError(
+				new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT)
+			);
 			return $params;
 		}
 
@@ -157,9 +161,17 @@ class Element extends \CBitrixComponent
 			return $properties;
 
 		if($this->arParams['images'])
+		{
 			foreach ($properties as $propCode => $prop)
+			{
 				if(array_key_exists($propCode, $this->arParams['images']))
-					$properties[$propCode]['VALUE'] = $this->processImageProp($propCode, $properties[$propCode]['VALUE']);
+				{
+					$properties[$propCode]['VALUE'] = $this->processImageProp(
+						$propCode, $properties[$propCode]['VALUE']
+					);
+				}
+			}
+		}
 
 		return $properties;
 	}
@@ -204,7 +216,7 @@ class Element extends \CBitrixComponent
 
 			$resizeModeList = [BX_RESIZE_IMAGE_EXACT, BX_RESIZE_IMAGE_PROPORTIONAL, BX_RESIZE_IMAGE_PROPORTIONAL_ALT];
 
-			if(empty($settigns[2]) || !in_array($settings[2], $resizeModeList))
+			if(empty($settings[2]) || !in_array($settings[2], $resizeModeList))
 				$resizeMode = BX_RESIZE_IMAGE_PROPORTIONAL;
 			else
 				$resizeMode = $settings[2];
