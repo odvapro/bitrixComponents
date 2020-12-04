@@ -17,7 +17,7 @@ class Element extends \CBitrixComponent
 
 	public function onPrepareComponentParams($params)
 	{
-		if(!Loader::includeModule('iblock') || !Loader::includeModule("catalog"))
+		if(!Loader::includeModule('iblock'))
 			return false;
 
 		if(!array_key_exists('id', $params) && !array_key_exists('code', $params))
@@ -33,6 +33,18 @@ class Element extends \CBitrixComponent
 			$this->errorCollection->setError(
 				new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT)
 			);
+			return $params;
+		}
+
+		if(!array_key_exists('IBLOCK_ID', $params))
+		{
+			$this->errorCollection->setError(new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT));
+			return $params;
+		}
+
+		if(array_key_exists('IBLOCK_ID', $params) && ((int)$params['IBLOCK_ID'] <= 0 || (int)$params['IBLOCK_ID'] != $params['IBLOCK_ID']))
+		{
+			$this->errorCollection->setError(new Error('Параметр "IBLOCK_ID" должен иметь числовое значение!', self::ERROR_TEXT));
 			return $params;
 		}
 
@@ -70,10 +82,13 @@ class Element extends \CBitrixComponent
 		if ($this->hasErrors())
 			return $this->processErrors();
 
+
 		if($this->arParams['id'])
-			$element = CIBlockElement::GetByID($this->arParams['id'])->Fetch();
+			$arFilter = ['IBLOCK_ID'=>$this->arParams['IBLOCK_ID'], 'ID'=> $this->arParams['id']];
 		else
-			$element = CIBlockElement::GetList([], ['CODE' => $this->arParams['code']])->Fetch();
+			$arFilter = ['IBLOCK_ID'=>$this->arParams['IBLOCK_ID'], 'CODE'=> $this->arParams['code']];
+
+		$element = CIBlockElement::GetList([], $arFilter)->Fetch();
 
 		if(!$element)
 		{
@@ -92,7 +107,7 @@ class Element extends \CBitrixComponent
 		if($this->arParams['load_section'] && !empty($element['IBLOCK_SECTION_ID']))
 			$element['SECTION'] = $this->loadSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
 
-		$element['PRICE'] = $this->getPrices($element['ID']);
+		// $element['PRICE'] = $this->getPrices($element['ID']);
 
 		$this->arResult = $element;
 
