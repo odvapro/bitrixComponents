@@ -274,7 +274,12 @@ class Elements extends CBitrixComponent
 		if(!array_key_exists('IBLOCK_ID', $firstItem))
 			return;
 
-		CIBlockElement::GetPropertyValuesArray($properties, $firstItem['IBLOCK_ID'], [], ['CODE' => $this->arParams['props']]);
+		CIBlockElement::GetPropertyValuesArray(
+			$properties,
+			$firstItem['IBLOCK_ID'],
+			[],
+			['CODE' => $this->arParams['props']]
+		);
 
 		foreach ($properties as $elementId => $propsArr)
 		{
@@ -284,7 +289,9 @@ class Elements extends CBitrixComponent
 				{
 					if(array_key_exists($propCode, $this->arParams['images']))
 					{
-						$propsArr[$propCode]['VALUE'] = $this->processImageProp($propCode, $propsArr[$propCode]['VALUE']);
+						$propsArr[$propCode]['VALUE'] = $this->processImageProp(
+							$propCode, $propsArr[$propCode]['VALUE']
+						);
 					}
 				}
 			}
@@ -333,7 +340,7 @@ class Elements extends CBitrixComponent
 
 			$resizeModeList = [BX_RESIZE_IMAGE_EXACT, BX_RESIZE_IMAGE_PROPORTIONAL, BX_RESIZE_IMAGE_PROPORTIONAL_ALT];
 
-			if(empty($settigns[2]) || !in_array($settings[2], $resizeModeList))
+			if(empty($settings[2]) || !in_array($settings[2], $resizeModeList))
 				$resizeMode = BX_RESIZE_IMAGE_PROPORTIONAL;
 			else
 				$resizeMode = $settings[2];
