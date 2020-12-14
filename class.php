@@ -2,6 +2,8 @@
 
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
+require 'ElementsParamsValidator.php';
+
 class Elements extends CBitrixComponent
 {
 	public $sections        = [];
@@ -9,55 +11,28 @@ class Elements extends CBitrixComponent
 
 	public function onPrepareComponentParams($arParams)
 	{
-		$defaultParams = [
-			'sort' => ['SORT' => 'ASC'],
+		$paramsValidatorRules = [
+			'sort'      => ['is_key_exists', 'is_array', '!empty'],
+			'filter'    => ['is_key_exists', 'is_array'],
+			'show_all'  => ['boolval'],
+			'pagn_id'   => ['is_key_exists', 'is_string', '!empty'],
+			'count'     => ['is_key_exists', 'is_numeric'],
+			'page'      => ['is_key_exists', 'is_numeric'],
+			'props'     => ['is_key_exists', 'is_array', '!empty'],
+			'price_ids' => ['is_key_exists', 'is_array', '!empty'],
+			'images'    => ['is_key_exists', 'is_assoc', '!empty'],
+		];
+
+		$paramsValidatorDefaults = [
+			'sort'   => ['SORT' => 'ASC'],
 			'filter' => []
 		];
 
-		foreach($defaultParams as $paramKey => $paramValue)
-			if(!array_key_exists($paramKey, $arParams) || !is_array($arParams[$paramKey]))
-				$arParams[$paramKey] = $paramValue;
-
-		if(!array_key_exists('show_all', $arParams) || !$arParams['show_all'])
-			$arParams['show_all'] = false;
-		else
-			$arParams['show_all'] = true;
-
-		if(!array_key_exists('pagn_id', $arParams) || !is_string($arParams['pagn_id']) || empty($arParams['pagn_id']))
-			$arParams['pagn_id'] = false;
-
-		if(!array_key_exists('count', $arParams) || !is_integer($arParams['count']) || empty($arParams['count']))
-			$arParams['count'] = false;
-
-		if(!array_key_exists('page', $arParams) || !is_integer($arParams['page']) || empty($arParams['page']))
-			$arParams['page'] = false;
-
-		if(
-			!array_key_exists('props', $arParams)
-			||
-			empty($arParams['props'])
-			||
-			!is_array($arParams['props'])
-		)
-			$arParams['props'] = false;
-
-		if(
-			!array_key_exists('price_ids', $arParams)
-			||
-			empty($arParams['price_ids'])
-			||
-			!is_array($arParams['price_ids'])
-		)
-			$arParams['price_ids'] = false;
-
-		if(
-			!array_key_exists('images', $arParams)
-			||
-			empty($arParams['images'])
-			||
-			array_keys($arParams['images']) === range(0, count($arParams['images']) - 1)
-		)
-			$arParams['images'] = false;
+		foreach ($paramsValidatorRules as $field => $rules)
+		{
+			$defaults = array_key_exists($field, $paramsValidatorDefaults) ? $paramsValidatorDefaults[$field] : false;
+			$arParams[$field] = ElementsParamsValidator::validate($field, $arParams, $rules, $defaults);
+		}
 
 		return $arParams;
 	}
@@ -87,6 +62,16 @@ class Elements extends CBitrixComponent
 	{
 		$selectParams = ['*'];
 
+		if(!empty($this->arParams['product']['props']))
+		{
+			$selectParams[] = "PROPERTY_CML2_LINK.ID";
+			$selectParams[] = "PROPERTY_CML2_LINK.IBLOCK_ID";
+
+			foreach ($this->arParams['product']['props'] as $prop)
+				if(!preg_match('/^PROPERTY_/', $prop))
+					$selectParams[] = "PROPERTY_CML2_LINK.{$prop}";
+		}
+
 		if($this->arParams['price_ids'])
 			foreach ($this->arParams['price_ids'] as $prop)
 				$selectParams = array_merge($selectParams, ["PRICE_{$prop}", "CURRENCY_{$prop}"]);
@@ -105,6 +90,15 @@ class Elements extends CBitrixComponent
 			else
 				$filterParams[$paramName] = $paramValue;
 		}
+
+		if(empty($this->arParams['product']['filter']))
+		{
+			$this->arResult['FILTER'] = $filterParams;
+			return;
+		}
+
+		foreach ($this->arParams['product']['filter'] as $paramName => $paramValue)
+			$filterParams["PROPERTY_CML2_LINK.{$paramName}"] = $paramValue;
 
 		$this->arResult['FILTER'] = $filterParams;
 	}
@@ -186,19 +180,110 @@ class Elements extends CBitrixComponent
 
 		unset($this->sections);
 
-		$this->loadProperties();
+		$this->processProperties();
+		$this->processImages();
+	}
+
+	private function processImages()
+	{
+		if(empty($this->arParams['images']))
+			return;
+
+		foreach ($this->arResult['ITEMS'] as $elementId => &$element)
+		{
+			foreach ($this->arParams['images'] as $imagePropCode => $variants)
+			{
+				if(array_key_exists($imagePropCode, $element))
+				{
+					$element[$imagePropCode] = $this->getImagePropValue(
+						$variants,
+						$element[$imagePropCode]['VALUE']
+					);
+				}
+
+				if(array_key_exists($imagePropCode, $element['PROPERTIES']))
+				{
+					$element['PROPERTIES'][$imagePropCode] = $this->getImagePropValue(
+						$variants,
+						$element['PROPERTIES'][$imagePropCode]['VALUE']
+					);
+				}
+
+				if(array_key_exists($imagePropCode, $element['PRODUCT']))
+				{
+					$element['PRODUCT'][$imagePropCode] = $this->getImagePropValue(
+						$variants,
+						$element['PRODUCT'][$imagePropCode]['VALUE']
+					);
+				}
+			}
+		}
+	}
+
+	private function processProperties()
+	{
+		if(empty($this->arResult['ITEMS']))
+			return;
+
+		if(!empty($this->arParams['props']))
+			$this->processElementProperties();
+
+		if(!empty($this->arParams['product']['props']))
+			$this->processProductProperties();
+	}
+
+	private function processProductProperties()
+	{
+		$firstItem   = reset($this->arResult['ITEMS']);
+		$iblockId    = $firstItem['PROPERTY_CML2_LINK_IBLOCK_ID'];
+		$elementsIds = array_unique(array_column($this->arResult['ITEMS'], 'PROPERTY_CML2_LINK_ID'));
+		$props       = [];
+
+		foreach ($this->arParams['product']['props'] as $prop)
+			if(preg_match('/^PROPERTY_(.*)$/', $prop, $matches))
+				$props[] = $matches[1];
+
+		$elementsProps = $this->getPropValues($iblockId, $elementsIds, $props);
+
+		foreach ($this->arResult['ITEMS'] as $itemId => $item)
+		{
+			foreach ($this->arParams['product']['props'] as $prop)
+			{
+				if(preg_match('/^PROPERTY_(.*)$/', $prop))
+					continue;
+
+				$elementsProps[$item['PROPERTY_CML2_LINK_ID']][$prop] = $item["PROPERTY_CML2_LINK_{$prop}"];
+
+				unset($this->arResult['ITEMS'][$itemId]["PROPERTY_CML2_LINK_{$prop}"]);
+			}
+
+			$elementsProps[$item['PROPERTY_CML2_LINK_ID']]['ID']        = $item["PROPERTY_CML2_LINK_ID"];
+			$elementsProps[$item['PROPERTY_CML2_LINK_ID']]['IBLOCK_ID'] = $item["PROPERTY_CML2_LINK_IBLOCK_ID"];
+
+			unset($this->arResult['ITEMS'][$itemId]["PROPERTY_CML2_LINK_ID"]);
+			unset($this->arResult['ITEMS'][$itemId]["PROPERTY_CML2_LINK_IBLOCK_ID"]);
+
+			$this->arResult['ITEMS'][$itemId]['PRODUCT'] = $elementsProps[$item['PROPERTY_CML2_LINK_ID']];
+		}
+	}
+
+	private function processElementProperties()
+	{
+		$firstItem   = reset($this->arResult['ITEMS']);
+		$iblockId    = $firstItem['IBLOCK_ID'];
+		$elementsIds = array_column($this->arResult['ITEMS'], 'ID');
+		$props       = $this->arParams['props'];
+
+		$elementsProps = $this->getPropValues($iblockId, $elementsIds, $props);
+
+		foreach ($this->arResult['ITEMS'] as $itemId => $item)
+			$this->arResult['ITEMS'][$itemId]['PROPERTIES'] = $elementsProps[$itemId];
 	}
 
 	private function processElement($element)
 	{
 		if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
 			$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
-
-		// подгрузка путей изображений в поля типа DETAIL_PICTURE и PREVIEW_PICTURE
-		if($this->arParams['images'])
-			foreach ($this->arParams['images'] as $imagePropCode => $variants)
-				if(array_key_exists($imagePropCode, $element))
-					$element[$imagePropCode] = $this->processImageProp($imagePropCode, $element[$imagePropCode]);
 
 		// перенос цен в общий массив, при необходимости подгрузка скидок
 		$this->processPrices($element);
@@ -262,53 +347,19 @@ class Elements extends CBitrixComponent
 		}
 	}
 
-	private function loadProperties()
+	private function getPropValues($iblockId, array $elementIds, array $propCodes)
 	{
-		if(empty($this->arParams['props']) || empty($this->arResult['ITEMS']))
-			return;
+		$result = array_fill_keys($elementIds, []);
 
-		$properties = array_fill_keys(array_column($this->arResult['ITEMS'], 'ID'), []);
+		CIBlockElement::GetPropertyValuesArray($result, $iblockId, [], ['CODE' => $propCodes]);
 
-		$firstItem = current(array_values($this->arResult['ITEMS']));
-
-		if(!array_key_exists('IBLOCK_ID', $firstItem))
-			return;
-
-		CIBlockElement::GetPropertyValuesArray(
-			$properties,
-			$firstItem['IBLOCK_ID'],
-			[],
-			['CODE' => $this->arParams['props']]
-		);
-
-		foreach ($properties as $elementId => $propsArr)
-		{
-			if($this->arParams['images'])
-			{
-				foreach ($propsArr as $propCode => $prop)
-				{
-					if(array_key_exists($propCode, $this->arParams['images']))
-					{
-						$propsArr[$propCode]['VALUE'] = $this->processImageProp(
-							$propCode, $propsArr[$propCode]['VALUE']
-						);
-					}
-				}
-			}
-
-			$this->arResult['ITEMS'][$elementId]['PROPERTIES'] = $propsArr;
-		}
+		return $result;
 	}
 
-	private function processImageProp($propCode, $realValue)
+	private function getImagePropValue($variants, $realValue)
 	{
-		if(!array_key_exists($propCode, $this->arParams['images']))
-			return false;
-
 		if(empty($realValue))
 			return $realValue;
-
-		$variants = $this->arParams['images'][$propCode];
 
 		if(is_array($realValue))
 		{

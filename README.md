@@ -2,6 +2,7 @@
 
 Компонент работает на основе метода [CIBlockElement::GetList](https://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php).
 
+
 ## Принимаемые параметры
 
 Можно передать некоторые стандартные параметры ```CIBlockElement::GetList```:
@@ -21,6 +22,25 @@
 - ***price_ids***      - массив ID цен ([правила работы с ценой](#работа-с-ценами)).
 - ***load_discounts*** - если true, то для указанных в ***price_ids*** цен будут подгружаться скидки ([правила работы с ценой](#работа-с-ценами)).
 
+<ins>***Поддержка работы с торговыми предложениями***</ins>
+
+Если нужно достать торговые предложения, то все параметры, указанные выше (**кроме images**) заполняются для инфоблока торгового предложения.
+Для инфоблока товаров можно передать дополнительный параметр ***product***:
+
+```
+[
+	'product' => [
+		'filter' => [
+			'NAME' => '',
+			'PROPERTY_TEST' => ''
+		],
+		'props' => ['PROPERTY_MORE_PHOTO', 'NAME']
+	]
+]
+```
+
+***Обратите внимание, все коды свойств продукта нужно писать с префиксом ```PROPERTY_```***
+
 Пример использования
 ```php
 $APPLICATION->IncludeCOmponent(
@@ -37,7 +57,14 @@ $APPLICATION->IncludeCOmponent(
 		'price_ids'      => [1, 4],
 		'load_discounts' => false,
 		'props'          => ['MORE_PHOTO', 'CML2_ARTICLE'],
-		'images'         => ['MORE_PHOTO' => ['small' => [100, 100]], 'PREVIEW_PICTURE' => ['small' => [100, 100]]]
+		'images'         => ['MORE_PHOTO' => ['small' => [100, 100]], 'PREVIEW_PICTURE' => ['small' => [100, 100]]],
+		'product' => [
+			'filter' => [
+				'NAME' => '',
+				'PROPERTY_TEST' => ''
+			],
+			'props' => ['PROPERTY_MORE_PHOTO', 'NAME']
+		]
 	]
 );
 ```
@@ -70,6 +97,8 @@ $APPLICATION->IncludeCOmponent(
 	(см. [документацию по обрезанию картинок](https://dev.1c-bitrix.ru/api_help/main/reference/cfile/resizeimageget.php)).
 
 *Коды свойств, которые передаются в images, *обязательно* нужно передать так же в *props*, иначе они не будут подгруженны и соответственно не обработаны.*
+
+*Коды свойств продукта передавать **без** префикса ```PROPERTY_```*
 
 
 ## Настройка пагинации
