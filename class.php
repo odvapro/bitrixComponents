@@ -39,7 +39,7 @@ class Elements extends CBitrixComponent
 
 	public function executeComponent()
 	{
-		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("catalog"))
+		if(!\Bitrix\Main\Loader::includeModule("iblock"))
 			return;
 
 		$this->initParams();
