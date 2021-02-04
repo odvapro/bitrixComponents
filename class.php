@@ -197,7 +197,7 @@ class Elements extends CBitrixComponent
 				{
 					$element[$imagePropCode] = $this->getImagePropValue(
 						$variants,
-						$element[$imagePropCode]['VALUE']
+						$element[$imagePropCode]
 					);
 				}
 
