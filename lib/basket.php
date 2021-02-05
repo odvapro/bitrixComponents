@@ -53,13 +53,13 @@ class Basket
 			$item['ID']               = $basketItem->getId();
 			$item['NAME']             = $basketItem->getField('NAME');
 			$item['PRODUCT_ID']       = $basketItem->getProductId();
-			$item['BASE_PRICE']       = number_format($basketItem->getBasePrice(), 2, '.', '');
-			$item['DISCOUNT_PRICE']   = number_format($basketItem->getDiscountPrice(), 2, '.', '');
+			$item['BASE_PRICE']       = $basketItem->getBasePrice();
+			$item['DISCOUNT_PRICE']   = $basketItem->getDiscountPrice();
 			$item['DISCOUNT_PERCENT'] = round(($basketItem->getDiscountPrice() * 100 / $basketItem->getBasePrice()), 0);
-			$item['PRICE']            = number_format($basketItem->getPrice(), 2, '.', '');
+			$item['PRICE']            = $basketItem->getPrice();
 			$item['QUANTITY']         = $basketItem->getQuantity();
 
-			$result[$item['ID']] 	= $item;
+			$result[$item['PRODUCT_ID']] 	  = $item;
 		}
 
 		return $result;
@@ -98,7 +98,8 @@ class Basket
 
 		return [
 			'BASE'     => $basket->getBasePrice(),
-			'PRICE'    => $basket->getPrice()
+			'PRICE'    => $basket->getPrice(),
+			'DISCOUNT' => (floatval($basket->getBasePrice()) - floatval($basket->getPrice()))
 		];
 	}
 
@@ -124,11 +125,12 @@ class Basket
 		else
 		{
 			$item = $basket->createItem('catalog', $productId);
+
 			$item->setFields([
 				'QUANTITY'               => $quantity,
 				'CURRENCY'               => \Bitrix\Currency\CurrencyManager::getBaseCurrency(),
 				'LID'                    => \Bitrix\Main\Context::getCurrent()->getSite(),
-				'PRODUCT_PROVIDER_CLASS' => \Bitrix\Catalog\Product\Basket::getDefaultProviderName() ,
+				'PRODUCT_PROVIDER_CLASS' => \Bitrix\Catalog\Product\Basket::getDefaultProviderName()
 			]);
 		}
 
@@ -157,7 +159,11 @@ class Basket
 		else
 			$item->setField('QUANTITY', $newQuantity);
 
-		return $basket->save();
+		$result = $basket->save();
+
+		self::reset();
+
+		return $result;
 	}
 
 	/**
@@ -175,8 +181,11 @@ class Basket
 			return new Error("Продукт #{$itemId} в корзине не найден.");
 
 		$item->delete();
+		$result = $basket->save();
 
-		return $basket->save();
+		self::reset();
+
+		return $result;
 	}
 
 	public function clear()
@@ -188,21 +197,26 @@ class Basket
 
 	public function getBasket()
 	{
-		if(self::$basket !== false)
-			return self::$basket;
+		if(self::$basket === false)
+			self::reset();
 
+		return self::$basket;
+	}
+
+	public function reset()
+	{
 		$basket    = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), SITE_ID);
 
 		$context   = new \Bitrix\Sale\Discount\Context\Fuser($basket->getFUserId());
 		$discounts = \Bitrix\Sale\Discount::buildFromBasket($basket, $context);
-		$result    = $discounts->calculate()->getData();
+
+		if(!empty($discounts))
+			$result = $discounts->calculate()->getData();
 
 		if(array_key_exists('BASKET_ITEMS', $result))
 			$basket->applyDiscount($result['BASKET_ITEMS']);
 
 		self::$basket = $basket;
-
-		return self::$basket;
 	}
 
 	/**
