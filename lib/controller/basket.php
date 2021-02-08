@@ -23,7 +23,11 @@ class Basket extends Controller
 
 	public function applyCouponAction($coupon='')
 	{
-		\Odva\Module\Basket::applyCoupon($coupon);
+		$result = \Odva\Module\Basket::applyCoupon($coupon);
+
+		if(!$result)
+			$this->addError(new Error('Промо-код введен неправильно', 'promocode'));
+
 		return \Odva\Module\Basket::getInfo();
 	}
 
