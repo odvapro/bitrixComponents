@@ -24,11 +24,11 @@ class SmartFilter extends CBitrixComponent
 			return;
 
 		$this->urlString = "";
-
 		if(!empty($this->arParams['FILTER_URL']))
 			$this->urlString = trim($this->arParams['FILTER_URL'], '/');
 
 		$this->IBLOCK_ID = $this->arParams['IBLOCK_ID'];
+		$this->SECTION_ID = $this->arParams['SECTION_ID']? $this->arParams['SECTION_ID']: 0 ;
 
 		$this->arResult = [
 			'ITEMS'  => [],
@@ -37,10 +37,10 @@ class SmartFilter extends CBitrixComponent
 		$this->initSectionId();
 		$this->initFacet();
 
-		$this->fillIBlockPropsInfo($this->IBLOCK_ID);
+		$this->fillIBlockPropsInfo($this->IBLOCK_ID, $this->SECTION_ID);
 
 		if(!empty($this->facet->getSkuIblockId()))
-			$this->fillIBlockPropsInfo($this->facet->getSkuIblockId(), 0, true);
+			$this->fillIBlockPropsInfo($this->facet->getSkuIblockId(), $this->SECTION_ID, true);
 
 		$this->makeFilter();
 
@@ -85,6 +85,7 @@ class SmartFilter extends CBitrixComponent
 		{
 			$this->arResult['ITEMS'][$propertyId]->setFilter($parsedFilter);
 			$this->arResult['ITEMS'][$propertyId]->setDictionary($propertyValuesDictionary);
+			$this->arResult['ITEMS'][$propertyId]->setFacet($this->facet, $facets);
 			$this->arResult['ITEMS'][$propertyId]->loadValuesData();
 		}
 
@@ -157,7 +158,7 @@ class SmartFilter extends CBitrixComponent
 
 			$arProperty = CIBlockProperty::GetByID($propertyId)->Fetch();
 
-			if(!$arProperty || empty($arProperty['CODE']))
+			if(!$arProperty || empty($arProperty['CODE']) || $arProperty['FILTRABLE'] != 'Y')
 				continue;
 
 			$fieldClassName = ucfirst($arProperty["PROPERTY_TYPE"]) . ucfirst($arProperty["USER_TYPE"]) . "Field";

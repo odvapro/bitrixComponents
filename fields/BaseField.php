@@ -12,6 +12,7 @@ abstract class BaseField
 	protected $filter;
 	protected $isSkuProperty;
 	protected $iblockId;
+	protected $facet;
 
 	abstract public function getDisplayValue($facetValue);
 	abstract public function getFilterValue($facetValue);
@@ -21,6 +22,7 @@ abstract class BaseField
 		$this->id            = $property['ID'];
 		$this->name          = $property["NAME"];
 		$this->code          = $property["CODE"];
+		$this->link_iblock_id = $property['LINK_IBLOCK_ID'];
 		$this->values        = [];
 		$this->dictionary    = [];
 		$this->filter        = [];
@@ -119,6 +121,11 @@ abstract class BaseField
 	public function setElementsCountFromFacet($facet)
 	{
 		$this->values[$facet['VALUE']]['ELEMENT_COUNT'] = $facet['ELEMENT_COUNT'];
+	}
+
+	public function setFacet($facet, $facets)
+	{
+		$this->facet = ['facet' => $facet, 'facetsList' => $facets];
 	}
 }
 
