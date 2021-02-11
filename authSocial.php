@@ -10,10 +10,11 @@ $user = json_decode($s, true);
 if(!empty($user['error']))
 	echo json_encode(['success'=>false,'msg'=>$user['error']]);
 
-if($user['network'] == 'facebook')
-	$networkField = ["UF_FACEBOOK" => $user['uid']];
-if($user['network'] == 'vkontakte')
-	$networkField = ["UF_VK" => $user['uid']];
+if(!empty($user['network']))
+{
+	$propertyName = "UF_".strtoupper($user['network']);
+	$networkField = [$propertyName => $user['uid']];
+}
 
 $filter  = ["ACTIVE" => "Y"];
 $filter  = array_merge($filter,$networkField);
