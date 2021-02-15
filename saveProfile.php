@@ -1,7 +1,6 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT']. "/bitrix/modules/main/include/prolog_before.php");
 include 'class.php';
-CModule::IncludeModule("catalog");
 global $USER;
 if(!$USER->IsAuthorized())
 {
@@ -9,8 +8,19 @@ if(!$USER->IsAuthorized())
 	die();
 }
 
-$needFields = ['name','lastname','birthday', 'phone', 'city', 'address'];
-foreach ($needFields as $fieldCode)
+$code = explode('.', $_POST['NEED_FIELDS']);
+$hash = hash('sha256', $code[0] . Profile::SECRET);
+
+if ($code[1] != $hash)
+{
+	echo json_encode(['success'=>false,'msg'=>'not all fields']);
+	die();
+}
+
+$arParams = (array)json_decode(base64_decode($code[0]));
+
+
+foreach ($arParams['NEED_FIELDS'] as $fieldCode)
 {
 	if(empty($_POST[$fieldCode]))
 	{
@@ -19,15 +29,21 @@ foreach ($needFields as $fieldCode)
 	}
 }
 
-$fields = [
-	"NAME"            => $_POST['name'],
-	"LAST_NAME"       => $_POST['lastname'],
-	"PERSONAL_BIRTHDAY" => $_POST['birthday'],
-	"ACTIVE"          => "Y",
-	"PERSONAL_PHONE"  => $_POST['phone'],
-	"PERSONAL_STREET" => $_POST['address'],
-	"PERSONAL_CITY"   => $_POST['city'],
-];
+if($arParams['LOGIN_IS_EMAIL'] == 'Y')
+{
+	$fields = [
+		'LOGIN'  => $_POST['EMAIL'],
+		"ACTIVE" => "Y",
+	];
+	$fields = array_merge($fields, $_POST);
+}
+else
+{
+	$fields = $_POST;
+}
+
+unset($_POST['NEED_FIELDS']);
+
 if(!$USER->Update($USER->GetID(), $fields))
 {
 	echo json_encode(['success'=>false,'msg'=>'something goes wrong']);

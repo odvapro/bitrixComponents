@@ -2,6 +2,7 @@
 
 class Profile extends CBitrixComponent
 {
+	const SECRET = 'huieMMJ24Vy6';
 	public function executeComponent()
 	{
 		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::includeModule("sale"))
@@ -14,6 +15,13 @@ class Profile extends CBitrixComponent
 		$arUser = $rsUser->Fetch();
 
 		$this->arResult = $arUser;
+
+		if(!empty($this->arParams['NEED_FIELDS']))
+		{
+			$code = base64_encode(json_encode($this->arParams));
+			$this->arResult['NEED_FIELDS'] = $code . '.' . hash('sha256', $code . Profile::SECRET);
+
+		}
 
 		$this->arResult['SAVE_PROFILE_PATH']       = $this->getPath()."/saveProfile.php";
 		$this->arResult['SAVE_PASSWORD_PATH']      = $this->getPath()."/savePassword.php";
