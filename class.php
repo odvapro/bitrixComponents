@@ -158,7 +158,7 @@ class SmartFilter extends CBitrixComponent
 
 			$arProperty = CIBlockProperty::GetByID($propertyId)->Fetch();
 
-			if(!$arProperty || empty($arProperty['CODE']) || $arProperty['FILTRABLE'] != 'Y')
+			if(!$arProperty || empty($arProperty['CODE']))
 				continue;
 
 			$fieldClassName = ucfirst($arProperty["PROPERTY_TYPE"]) . ucfirst($arProperty["USER_TYPE"]) . "Field";
