@@ -42,6 +42,13 @@ else
 	];
 	$arFields = array_merge($arFields,$networkField);
 	$ID = $newUser->Add($arFields);
-	$USER->Authorize($ID);
-	echo json_encode(['success'=>true,'msg'=>"Вы успешно Зарегестрировались"]);
+	if($ID)
+	{
+		$USER->Authorize($ID);
+		echo json_encode(['success'=>true,'msg'=>"Вы успешно Зарегестрировались"]);
+	}
+	else
+	{
+		echo json_encode(['success'=>false,'msg'=>$newUser->LAST_ERROR]);
+	}
 }
