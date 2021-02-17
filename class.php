@@ -282,13 +282,45 @@ class Elements extends CBitrixComponent
 
 	private function processElement($element)
 	{
-		if(!empty($element['IBLOCK_SECTION_ID']) && !empty($this->arParams['load_section']))
+		if(
+			!empty($element['IBLOCK_SECTION_ID'])
+			&&
+			(
+				!empty($this->arParams['load_section'])
+				||
+				!empty($this->arParams['load_urls'])
+			)
+		)
+		{
 			$element['SECTION'] = $this->getSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
+		}
 
 		// перенос цен в общий массив, при необходимости подгрузка скидок
 		$this->processPrices($element);
 
+		$this->processUrls($element);
+
 		return $element;
+	}
+
+	public function processUrls(&$element)
+	{
+		if(empty($this->arParams['load_urls']))
+			return;
+
+		$element['LIST_PAGE_URL']   = \CIBlock::ReplaceDetailUrl(
+			$element['SECTION']['SECTION_PAGE_URL'],
+			$element['SECTION'],
+			true,
+			false
+		);
+
+		$element['DETAIL_PAGE_URL'] = \CIBlock::ReplaceDetailUrl(
+			$element['DETAIL_PAGE_URL'],
+			$element,
+			true,
+			false
+		);
 	}
 
 	public function processPrices(&$element)
