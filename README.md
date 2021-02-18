@@ -148,4 +148,3 @@ $APPLICATION->IncludeComponent(
 				- оставляем параметры навигации пустым массивом
 			- если нет параметра show_all
 				- передаем в getlist параметр nTopCount
- 
