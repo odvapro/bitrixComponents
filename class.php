@@ -111,7 +111,101 @@ class Element extends \CBitrixComponent
 
 		$this->arResult = $element;
 
+		$this->processSeoData();
+
 		$this->includeComponentTemplate();
+	}
+
+	public function processSeoData()
+	{
+		global $APPLICATION;
+
+		if ($this->arParams['SET_CANONICAL_URL'] === 'Y' && $this->arResult["CANONICAL_PAGE_URL"])
+			$APPLICATION->SetPageProperty('canonical', $this->arResult["CANONICAL_PAGE_URL"]);
+
+		// говнокод скопирован из компонента news.detail
+		if(
+			$this->arParams["SET_TITLE"] !== 'Y' && $this->arParams["ADD_ELEMENT_CHAIN"] !== 'Y'&&
+			$this->arParams["SET_BROWSER_TITLE"] !== 'Y' && $this->arParams["SET_META_KEYWORDS"] !== 'Y'&&
+			$this->arParams["SET_META_DESCRIPTION"] === 'Y'
+		)
+			return;
+
+		$ipropValues = new \Bitrix\Iblock\InheritedProperty\ElementValues(
+			$this->arResult["IBLOCK_ID"],
+			$this->arResult["ID"]
+		);
+
+		$this->arResult["IPROPERTY_VALUES"] = $ipropValues->getValues();
+
+		if ($this->arParams["SET_TITLE"] === 'Y')
+		{
+			if(!empty($this->arResult["IPROPERTY_VALUES"]["ELEMENT_PAGE_TITLE"]))
+				$title = $this->arResult["IPROPERTY_VALUES"]["ELEMENT_PAGE_TITLE"];
+			else
+				$title = $this->arResult["NAME"];
+
+			$APPLICATION->SetTitle($title);
+
+			unset($title);
+		}
+
+		if ($this->arParams["ADD_ELEMENT_CHAIN"] === 'Y')
+		{
+			if(!empty($this->arResult["IPROPERTY_VALUES"]["ELEMENT_PAGE_TITLE"]))
+				$elementChain = $this->arResult["IPROPERTY_VALUES"]["ELEMENT_PAGE_TITLE"];
+			else
+				$elementChain = $this->arResult["NAME"];
+
+			$APPLICATION->AddChainItem($elementChain);
+		}
+
+		if ($this->arParams["SET_BROWSER_TITLE"] === 'Y')
+		{
+			$browserTitle = \Bitrix\Main\Type\Collection::firstNotEmpty(
+				$this->arResult["PROPERTIES"],
+				[$this->arParams["BROWSER_TITLE"], "VALUE"],
+				$this->arResult,
+				$this->arParams["BROWSER_TITLE"],
+				$this->arResult["IPROPERTY_VALUES"],
+				"ELEMENT_META_TITLE"
+			);
+
+			if(!empty($browserTitle))
+				$APPLICATION->SetPageProperty("title", $browserTitle);
+
+			unset($browserTitle);
+		}
+
+		if ($this->arParams["SET_META_KEYWORDS"] === 'Y')
+		{
+			$metaKeywords = \Bitrix\Main\Type\Collection::firstNotEmpty(
+				$this->arResult["PROPERTIES"],
+				[$this->arParams["META_KEYWORDS"], "VALUE"],
+				$this->arResult["IPROPERTY_VALUES"],
+				"ELEMENT_META_KEYWORDS"
+			);
+
+			if(!empty($metaKeywords))
+				$APPLICATION->SetPageProperty("keywords", $metaKeywords);
+
+			unset($metaKeywords);
+		}
+
+		if ($this->arParams["SET_META_DESCRIPTION"] === 'Y')
+		{
+			$metaDescription = \Bitrix\Main\Type\Collection::firstNotEmpty(
+				$this->arResult["PROPERTIES"],
+				[$this->arParams["META_DESCRIPTION"], "VALUE"],
+				$this->arResult["IPROPERTY_VALUES"],
+				"ELEMENT_META_DESCRIPTION"
+			);
+
+			if(!empty($metaDescription))
+				$APPLICATION->SetPageProperty("description", $metaDescription);
+
+			unset($metaDescription);
+		}
 	}
 
 	private function getPrices($elementId)
