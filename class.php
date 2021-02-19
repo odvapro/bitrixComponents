@@ -62,7 +62,7 @@ class Element extends \CBitrixComponent
 		else
 			$params['load_section'] = true;
 
-		if(!array_key_exists('price_ids', $params) || !is_array($params['price_ids']) || empty($arParams['price_ids']))
+		if(!array_key_exists('price_ids', $params) || !is_array($params['price_ids']) || empty($params['price_ids']))
 			$params['price_ids'] = false;
 
 		if(
@@ -107,7 +107,7 @@ class Element extends \CBitrixComponent
 		if($this->arParams['load_section'] && !empty($element['IBLOCK_SECTION_ID']))
 			$element['SECTION'] = $this->loadSection($element['IBLOCK_SECTION_ID'], $element['IBLOCK_ID']);
 
-		$element['PRICE'] = $this->getPrices($element['ID']);
+		$element['PRICES'] = $this->getPrices($element['ID']);
 
 		$this->arResult = $element;
 
@@ -210,7 +210,7 @@ class Element extends \CBitrixComponent
 
 	private function getPrices($elementId)
 	{
-		if(!$arParams['price_ids'])
+		if(!$this->arParams['price_ids'])
 			return;
 
 		global $USER;
