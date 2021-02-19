@@ -263,9 +263,10 @@ class Element extends \CBitrixComponent
 
 	private function loadProperties($elementId, $iblockId)
 	{
-		$properties = [$elementId => false];
+		$properties       = [$elementId => false];
+		$propertiesFilter = in_array('*', $this->arParams['props']) ? [] : ['CODE' => $this->arParams['props']];
 
-		CIBlockElement::GetPropertyValuesArray($properties, $iblockId, [], ['CODE' => $this->arParams['props']]);
+		CIBlockElement::GetPropertyValuesArray($properties, $iblockId, [], $propertiesFilter);
 
 		$properties = $properties[$elementId];
 
