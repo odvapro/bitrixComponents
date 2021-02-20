@@ -65,6 +65,13 @@ class SmartFilter extends CBitrixComponent
 				$filter[$filterKey][$filterData['propertyCode']] = $filterData['filter'];
 		}
 
+		$parsedFilter = $this->getParsedFilterFromUrl();
+		foreach ($this->arParams['ADDITIONAL_PROPERTIES'] as $properties)
+		{
+			if(!empty($parsedFilter[$properties]))
+				$filter['products'][$properties] = $parsedFilter[$properties];
+		}
+
 		return $filter;
 	}
 
