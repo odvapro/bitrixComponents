@@ -24,8 +24,15 @@ class SmartFilter extends CBitrixComponent
 			return;
 
 		$this->urlString = "";
-		if(!empty($this->arParams['FILTER_URL']))
-			$this->urlString = trim($this->arParams['FILTER_URL'], '/');
+		$this->urlArray = [];
+		
+		if(!empty($this->arParams['FILTER_URL']))	
+		{
+			if(is_array($this->arParams['FILTER_URL']))
+				$this->urlArray = $this->arParams['FILTER_URL'];
+			else
+				$this->urlString = trim($this->arParams['FILTER_URL'], '/');
+		}
 
 		$this->IBLOCK_ID = $this->arParams['IBLOCK_ID'];
 		$this->SECTION_ID = $this->arParams['SECTION_ID']? $this->arParams['SECTION_ID']: 0 ;
@@ -230,6 +237,9 @@ class SmartFilter extends CBitrixComponent
 	{
 		$filter = [];
 
+		if(!empty($this->urlArray))
+			return $this->urlArray;
+
 		if(empty($this->urlString))
 			return $filter;
 
@@ -238,7 +248,29 @@ class SmartFilter extends CBitrixComponent
 
 		foreach ($filterParts as $filterItemCode => $filterItemValues)
 		{
-			$filterItemValues = explode('-', $filterItemValues);
+			$filterItemValues = explode(':', $filterItemValues);
+			$items = [];
+			foreach ($filterItemValues as $item)
+				$items[] = urldecode($item);
+
+			$filter[$filterItemCode] = $items;
+		}
+		return $filter;
+	}
+
+	public function getParsedFilterFromUrlString($strUrl)
+	{
+		$filter = [];
+
+		if(!is_string($strUrl))
+			return $filter;
+
+		$filterParts = array_chunk(explode('/', trim($strUrl, '/')), 2);
+		$filterParts = array_combine(array_column($filterParts, 0), array_column($filterParts, 1));
+
+		foreach ($filterParts as $filterItemCode => $filterItemValues)
+		{
+			$filterItemValues = explode(':', $filterItemValues);
 			$items = [];
 			foreach ($filterItemValues as $item)
 				$items[] = urldecode($item);
