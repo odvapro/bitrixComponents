@@ -33,7 +33,7 @@ class SmartFilter extends CBitrixComponent
 		$this->arResult = [
 			'ITEMS'  => [],
 		];
-
+		$this->arResult['PARSED_FILTER'] = $this->getParsedFilterFromUrl();
 		$this->initSectionId();
 		$this->initFacet();
 
@@ -65,7 +65,7 @@ class SmartFilter extends CBitrixComponent
 				$filter[$filterKey][$filterData['propertyCode']] = $filterData['filter'];
 		}
 
-		$parsedFilter = $this->getParsedFilterFromUrl();
+		$parsedFilter = $this->arResult['PARSED_FILTER'];
 		foreach ($this->arParams['ADDITIONAL_PROPERTIES'] as $properties)
 		{
 			if(!empty($parsedFilter[$properties]))
@@ -77,7 +77,7 @@ class SmartFilter extends CBitrixComponent
 
 	public function makeFilter()
 	{
-		$parsedFilter = $this->getParsedFilterFromUrl();
+		$parsedFilter = $this->arResult['PARSED_FILTER'];
 
 		$facetFilter = [
 			"ACTIVE_DATE"       => "Y",
@@ -173,7 +173,7 @@ class SmartFilter extends CBitrixComponent
 			$this->addFieldClass($fieldClassName, $arProperty, $arLink, $isSkuProperty);
 		}
 
-		$parsedFilter = $this->getParsedFilterFromUrl();
+		$parsedFilter = $this->arResult['PARSED_FILTER'];
 
 		if(
 			!empty($this->arParams['PRICE'])
