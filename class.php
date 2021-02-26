@@ -250,22 +250,10 @@ class SmartFilter extends CBitrixComponent
 		if(empty($this->urlString))
 			return $filter;
 
-		$filterParts = array_chunk(explode('/', trim($this->urlString, '/')), 2);
-		$filterParts = array_combine(array_column($filterParts, 0), array_column($filterParts, 1));
-
-		foreach ($filterParts as $filterItemCode => $filterItemValues)
-		{
-			$filterItemValues = explode(':', $filterItemValues);
-			$items = [];
-			foreach ($filterItemValues as $item)
-				$items[] = urldecode($item);
-
-			$filter[$filterItemCode] = $items;
-		}
-		return $filter;
+		return $this->parseUrlString($this->urlString);
 	}
 
-	public function getParsedFilterFromUrlString($strUrl)
+	public function parseUrlString($strUrl)
 	{
 		$filter = [];
 
