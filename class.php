@@ -7,11 +7,11 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
 class Form extends CBitrixComponent
 {
-	public static SIGNER_SECRET    = "huieMMJ24Vy6";
-	public static SIGNER_SEPARATOR = "||";
+	public static $SIGNER_SECRET    = "huieMMJ24Vy6";
+	public static $SIGNER_SEPARATOR = "||";
 
-	public static ERROR_TEXT = 1;
-	public static ERROR_404 = 2;
+	public static $ERROR_TEXT = 1;
+	public static $ERROR_404 = 2;
 
 	public function __construct($component = null)
 	{
@@ -26,7 +26,7 @@ class Form extends CBitrixComponent
 		if($params['IBLOCK_ID'] <= 0)
 		{
 			$this->errorCollection->setError(
-				new Error('Параметр "IBLOCK_ID" должен иметь числовое значение!', self::ERROR_TEXT)
+				new Error('Параметр "IBLOCK_ID" должен иметь числовое значение!', self::$ERROR_TEXT)
 			);
 		}
 
@@ -70,8 +70,8 @@ class Form extends CBitrixComponent
 	{
 		$signer = new Signer;
 
-		$signer->setKey(self::SIGNER_SECRET);
-		$signer->setSeparator(self::SIGNER_SEPARATOR);
+		$signer->setKey(self::$SIGNER_SECRET);
+		$signer->setSeparator(self::$SIGNER_SEPARATOR);
 
 		return $signer;
 	}
