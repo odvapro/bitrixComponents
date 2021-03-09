@@ -6,38 +6,32 @@ $errors      = [];
 $iblockId    = false;
 $elementName = false;
 
-if(array_key_exists('PARAMS', $_POST))
+$signedParams = Form::getParamsFromSignedString($_POST['TOKEN']);
+
+if($signedParams === false)
 {
-	$signedParams = Form::getParamsFromSignedString($_POST['PARAMS']);
+	echo json_encode(['success' => false, 'errors' => ['global' => 'Не корректный запрос.']]);
+	exit();
+}
 
-	if($signedParams === false)
-	{
-		echo json_encode(['success' => false, 'errors' => ['global' => 'Не корректный запрос.']]);
-		exit();
-	}
+if(array_key_exists('REQUIRED_FIELDS', $signedParams))
+	foreach ($signedParams['REQUIRED_FIELDS'] as $requiredField)
+		if(empty($_POST[$requiredField]))
+			$errors[$requiredField] = 'Заполните поле.';
 
-	if(array_key_exists('REQUIRED_FIELDS', $signedParams))
-		foreach ($signedParams['REQUIRED_FIELDS'] as $requiredField)
-			if(empty($_POST[$requiredField]))
-				$errors[$requiredField] = 'Заполните поле.';
-
-	if(!empty($errors))
-	{
-		echo json_encode(['success' => false, 'errors' => $errors]);
-		exit();
-	}
-
-	$iblockId    = $signedParams['IBLOCK_ID'];
-	$elementName = $signedParams['ELEMENT_NAME'];
+if(!empty($errors))
+{
+	echo json_encode(['success' => false, 'errors' => $errors]);
+	exit();
 }
 
 \Bitrix\Main\Loader::includeModule("iblock");
 
 $arFields = [
 	"ACTIVE"            => "Y",
-	"IBLOCK_ID"         => $iblockId,
+	"IBLOCK_ID"         => $signedParams['IBLOCK_ID'],
 	"IBLOCK_SECTION_ID" => false,
-	"NAME"              => $elementName,
+	"NAME"              => $signedParams['ELEMENT_NAME'],
 	"PROPERTY_VALUES"   => $_POST
 ];
 

@@ -45,7 +45,7 @@ class Form extends CBitrixComponent
 			return $this->processErrors();
 
 		$this->arResult['PATH_AJAX'] = $this->getPath() . '/ajax.php';
-		$this->arResult['PARAMS']    = $this->getSignedParamsToken();
+		$this->arResult['TOKEN']     = $this->getSignedParamsToken();
 
 		$this->IncludeComponentTemplate();
 	}
@@ -55,14 +55,19 @@ class Form extends CBitrixComponent
 		if(!$this->arParams['PROTECTED_PARAMS'])
 			return false;
 
-		$params = [];
+		$params = [
+			'IBLOCK_ID'    => $this->arParams['IBLOCK_ID'],
+			'ELEMENT_NAME' => $this->arParams['ELEMENT_NAME'],
+		];
 
-		foreach ($this->arParams['PROTECTED_PARAMS'] as $paramKey)
-			if(array_key_exists($paramKey, $this->arParams))
-				$params[$paramKey] = $this->arParams[$paramKey];
+		if(!empty($this->arParams['PROTECTED_PARAMS']))
+		{
+			$params['PROTECTED_PARAMS'] = [];
 
-		if(!count($params))
-			return false;
+			foreach ($this->arParams['PROTECTED_PARAMS'] as $paramKey)
+				if(array_key_exists($paramKey, $this->arParams))
+					$params[$paramKey] = $this->arParams[$paramKey];
+		}
 
 		$data = base64_encode(json_encode($params));
 
