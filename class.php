@@ -8,7 +8,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 class Form extends CBitrixComponent
 {
 	public static $SIGNER_SECRET    = "huieMMJ24Vy6";
-	public static $SIGNER_SEPARATOR = "||";
+	public static $SIGNER_SEPARATOR = "---";
 
 	public static $ERROR_TEXT = 1;
 	public static $ERROR_404 = 2;
@@ -44,7 +44,8 @@ class Form extends CBitrixComponent
 		if ($this->hasErrors())
 			return $this->processErrors();
 
-		$arResult['PATH_AJAX'] = dirname(__FILE__).'/ajax.php';
+		$this->arResult['PATH_AJAX'] = $this->getPath() . '/ajax.php';
+		$this->arResult['PARAMS']    = $this->getSignedParamsToken();
 
 		$this->IncludeComponentTemplate();
 	}
@@ -63,17 +64,31 @@ class Form extends CBitrixComponent
 		if(!count($params))
 			return false;
 
-		$signer = self::getSigner();
+		$data = base64_encode(json_encode($params));
+
+		return base64_encode($data . self::$SIGNER_SEPARATOR . hash('sha256', $data . self::$SIGNER_SECRET));
 	}
 
-	public static function getSigner()
+	public static function getParamsFromSignedString($signedString)
 	{
-		$signer = new Signer;
+		if(empty($signedString))
+			return false;
 
-		$signer->setKey(self::$SIGNER_SECRET);
-		$signer->setSeparator(self::$SIGNER_SEPARATOR);
+		$signedString = base64_decode($signedString);
 
-		return $signer;
+		list($params, $hash) = explode(self::$SIGNER_SEPARATOR, $signedString);
+
+		if(empty($params) || empty($hash))
+			return false;
+
+		$newHash = hash('sha256', $params . self::$SIGNER_SECRET);
+
+		if($hash !== $newHash)
+			return false;
+
+		$params = json_decode(base64_decode($params), true);
+
+		return $params;
 	}
 
 	private function hasErrors()

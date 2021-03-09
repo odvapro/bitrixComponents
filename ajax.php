@@ -1,25 +1,56 @@
 <?php
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
-CModule::IncludeModule("iblock");
+include 'class.php';
 
-foreach ($_POST as $key => $value)
+$errors      = [];
+$iblockId    = false;
+$elementName = false;
+
+if(array_key_exists('PARAMS', $_POST))
 {
-	if(empty($value))
+	$signedParams = Form::getParamsFromSignedString($_POST['PARAMS']);
+
+	if($signedParams === false)
 	{
-		echo json_encode(['success'=>false]);
+		echo json_encode(['success' => false, 'errors' => ['global' => 'Не корректный запрос.']]);
 		exit();
 	}
+
+	if(array_key_exists('REQUIRED_FIELDS', $signedParams))
+		foreach ($signedParams['REQUIRED_FIELDS'] as $requiredField)
+			if(empty($_POST[$requiredField]))
+				$errors[$requiredField] = 'Заполните поле.';
+
+	if(!empty($errors))
+	{
+		echo json_encode(['success' => false, 'errors' => $errors]);
+		exit();
+	}
+
+	$iblockId    = $signedParams['IBLOCK_ID'];
+	$elementName = $signedParams['ELEMENT_NAME'];
 }
 
-$arFields = array(
-   "ACTIVE" => "Y",
-   "IBLOCK_ID" => $_POST['IBLOCK_ID'],
-   "IBLOCK_SECTION_ID" => false,
-   "NAME" => $_POST['NAME_FORM_RESULT'],
-   "CODE" => "NEWRESULT",
-   "PROPERTY_VALUES" => $_POST
-);
-$oElement  = new CIBlockElement();
-$idElement = $oElement->Add($arFields, false, false, true);
-$result    = CEvent::Send($_POST['MAIL_EVENT_CODE'], "s1", $_POST);
-echo json_encode(['success'=>true]);
+\Bitrix\Main\Loader::includeModule("iblock");
+
+$arFields = [
+	"ACTIVE"            => "Y",
+	"IBLOCK_ID"         => $iblockId,
+	"IBLOCK_SECTION_ID" => false,
+	"NAME"              => $elementName,
+	"PROPERTY_VALUES"   => $_POST
+];
+
+$el = new CIBlockElement;
+$id = $el->Add($arFields);
+
+if(!$id)
+{
+	echo json_encode(['success' => false, 'errors' => ['global' => $el->LAST_ERROR]]);
+	exit();
+}
+
+if(!empty($_POST['MAIL_EVENT_CODE']))
+	CEvent::Send($_POST['MAIL_EVENT_CODE'], SITE_ID, $_POST);
+
+echo json_encode(['success' => true]);
