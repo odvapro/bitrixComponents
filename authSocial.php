@@ -30,8 +30,8 @@ else
 	// register
 	$newUser = new CUser;
 	$arFields = [
-		"NAME"              => "{$user['first_name']} {$user['last_name']}",
-		"LAST_NAME"         => "",
+		"NAME"              => "{$user['first_name']}",
+		"LAST_NAME"         => "{$user['last_name']}",
 		"EMAIL"             => $user['email'],
 		"LOGIN"             => $user['email'],
 		"LID"               => SITE_ID,
