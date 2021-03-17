@@ -37,7 +37,7 @@ class Orders extends CBitrixComponent
 		while ($arItem = $dbItemsInOrder->Fetch())
 		{
 			$arItem['PROPERTIES'] = $this->getProductProps($arItem['ID']);
-			$products[$arItems['PRODUCT_ID']] = $arItem;
+			$products[$arItem['PRODUCT_ID']] = $arItem;
 		}
 		return $products;
 	}
