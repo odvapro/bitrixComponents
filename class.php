@@ -15,7 +15,7 @@ class Sections extends CBitrixComponent
 	{
 		$arSelect = [];
 		$sections = [];
-		$res = CIBlockSection::GetList([], $filter, true, $arSelect,["nPageSize" => $count]);
+		$res = CIBlockSection::GetList(['SORT' => 'asc'], $filter, true, $arSelect,["nPageSize" => $count]);
 		while($ob = $res->GetNextElement())
 		{
 			$arFields            = $ob->GetFields();
