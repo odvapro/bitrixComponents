@@ -7,15 +7,19 @@ class Sections extends CBitrixComponent
 		if(!\Bitrix\Main\Loader::includeModule("iblock"))
 			return;
 
-		$this->getSections($this->arParams['filter'], $this->arParams["count"]);
+		$this->getSections($this->arParams['filter'], $this->arParams['sort'], $this->arParams["count"]);
 
 		$this->IncludeComponentTemplate();
 	}
-	public function getSections($filter, $count = 10)
+	public function getSections($filter, $sort, $count = 10)
 	{
 		$arSelect = [];
 		$sections = [];
-		$res = CIBlockSection::GetList(['SORT' => 'asc'], $filter, true, $arSelect,["nPageSize" => $count]);
+
+		if(!is_array($sort) || empty($sort))
+			$sort = [];
+
+		$res = CIBlockSection::GetList($sort, $filter, true, $arSelect,["nPageSize" => $count]);
 		while($ob = $res->GetNextElement())
 		{
 			$arFields            = $ob->GetFields();
