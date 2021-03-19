@@ -46,7 +46,7 @@ unset($_POST['NEED_FIELDS']);
 
 if(!$USER->Update($USER->GetID(), $fields))
 {
-	echo json_encode(['success'=>false,'msg'=>'something goes wrong']);
+	echo json_encode(['success'=>false,'msg'=>$USER->LAST_ERROR]);
 	die();
 }
 
