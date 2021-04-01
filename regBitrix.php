@@ -13,10 +13,17 @@ foreach ($needFields as $fieldCode)
 	}
 }
 //попытка зарегистрироватся
-$arResult = $USER->Register($_POST['email'], "", "", $_POST['password'], $_POST['confirm'], $_POST['email']);
+$arResult = $USER->Register($_POST['email'], $_POST['fio'], "", $_POST['password'], $_POST['confirm'], $_POST['email']);
+
 //если успещно
 if($arResult['MESSAGE'] == "Вы были успешно зарегистрированы.")
 {
+	if($_POST['phone'])
+	{
+		$user = new CUser;
+		$user->Update($USER->GetID(), ['PERSONAL_PHONE' => $_POST['phone']]);
+	}
+
 	echo json_encode(['success'=>true,'msg'=>strip_tags($arResult['MESSAGE'])]);
 }
 else
