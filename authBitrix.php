@@ -13,7 +13,11 @@ foreach ($needFields as $fieldCode)
 	}
 }
 //если успещно
-$arAuthResult = $USER->Login($_POST['email'], $_POST['password']);
+if(!empty($_POST['remember']))
+	$arAuthResult = $USER->Login($_POST['email'], $_POST['password'], 'Y');
+else
+	$arAuthResult = $USER->Login($_POST['email'], $_POST['password']);
+
 if($arAuthResult['MESSAGE'])
 {
 	echo json_encode(['success'=>false,'msg'=>strip_tags($arAuthResult['MESSAGE'])]);
