@@ -69,7 +69,7 @@ class Basket extends Controller
 
 		$result = \Odva\Module\Basket::addItem($productId, $quantity);
 
-		if($result)
+		if($result->isSuccess())
 			return \Odva\Module\Basket::getCount();
 
 		$this->addErrors($result->getErrors());

@@ -111,6 +111,13 @@ class Basket
 	 */
 	public function addItem($productId, $quantity)
 	{
+		if(!\CCatalogProduct::GetByID($productId))
+		{
+			$result = new \Bitrix\Sale\Result();
+			$result->addError(new Error("Продукт #{$productId} не найден."));
+			return $result;
+		}
+
 		$basket = self::getBasket();
 
 		if ($item = $basket->getExistsItem('catalog', $productId))
