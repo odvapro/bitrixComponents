@@ -45,6 +45,9 @@ class Elements extends CBitrixComponent
 		$this->initParams();
 		$this->makeResult();
 
+		if(defined('COMPONENT_RETURN_RESULT') && COMPONENT_RETURN_RESULT === true)
+			return $this->arResult;
+
 		$this->IncludeComponentTemplate();
 	}
 
