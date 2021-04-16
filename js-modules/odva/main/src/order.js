@@ -9,9 +9,9 @@ class OdvaOrder extends Observer
 		this.eventScope = 'order';
 	}
 
-	async getBasket(iblockId)
+	async getBasket()
 	{
-		let response = await this.getResponse('getBasket', {iblockId: iblockId});
+		let response = await this.getResponse('getBasket');
 		this.notify('getBasket', response);
 		return response;
 	}

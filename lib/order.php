@@ -10,86 +10,16 @@ Loader::includeModule("catalog");
 
 class Order
 {
-	public function getBasket($iblockId)
+	public function getBasketObject()
 	{
 		$basket = \Bitrix\Sale\Basket::loadItemsForFUser(\Bitrix\Sale\Fuser::getId(), \Bitrix\Main\Context::getCurrent()->getSite());
-
-		if(count($basket->getQuantityList()) < 1)
-			return [];
-
-		$products = self::getProducts($basket, $iblockId);
-
-		$basketPrice = self::getBasketPrice($basket);
-
-		return ['PRODUCTS' => $products, 'PRICE' => $basketPrice];
+		return $basket;
 	}
 
-	public function getBasketPrice($basket)
+	public function getBasket()
 	{
-		$price = [];
-
-		$price['BASE_PRICE'] = $basket->getBasePrice();
-		$price['DISCOUNT'] = $price['BASE_PRICE'] - $basket->getPrice();
-		$price['PROC_DISCOUNT'] = ($price['PRICE'] / 100) * $price['DISCOUNT'];
-
-		return $price;
-	}
-
-	public function getPrice($basket, $productsNoPrice)
-	{
-		$products = $productsNoPrice;
-
-		$context = new \Bitrix\Sale\Discount\Context\Fuser($basket->getFUserId());
-		$discounts = \Bitrix\Sale\Discount::buildFromBasket($basket, $context);
-		$r = $discounts->calculate();
-		$result = $r->getData();
-
-		foreach ($result['BASKET_ITEMS'] as $idProduct => $itemPrice)
-		{
-			$products[$idProduct]['PRICE'] = [];
-
-			$products[$idProduct]['PRICE']['BASE_PRICE'] = $itemPrice['PRICE'];
-			$products[$idProduct]['PRICE']['DISCOUNT'] = $itemPrice['DISCOUNT_PRICE'];
-			$products[$idProduct]['PRICE']['PROC_DISCOUNT'] = ($itemPrice['PRICE'] / 100) * $itemPrice['DISCOUNT'];
-		}
-
-		return $products;
-	}
-
-	public function getProducts($basket, $iblockId)
-	{
-		$products = [];
-
-		foreach ($basket as $item)
-		{
-			if(empty($item))
-				continue;
-
-			$productId = $item->getProductId();
-			$entryId = $item->getId();
-			$products[$entryId] = self::getProduct(['IBLOCK_ID' => (int)$iblockId, 'ID' => (int)$productId]);
-			$products[$entryId]['QUANTITY'] = $item->getQuantity();
-			$products[$entryId]['ENTRY_ID'] = $entryId;
-		}
-
-		$resultProducts = self::getPrice($basket, $products);
-
-		return $resultProducts;
-	}
-
-	public function getProduct($filter)
-	{
-		$res = \CIBlockElement::GetList([], $filter, false, [], []);
-
-		$product = false;
-
-		if($ob = $res->GetNextElement())
-		{
-			$product = $ob->GetFields();
-			$product['PROPERTIES'] = $ob->getProperties();
-		}
-
-		return $product;
+		$info = \Odva\Module\Basket::getInfo();
+		return $info;
 	}
 
 	public function getPaySystems()
@@ -202,7 +132,7 @@ class Order
 			if (!$shipment->isSystem())
 			{
 				$deliveryIds = \Bitrix\Sale\Delivery\Services\Manager::getRestrictedObjectsList($shipment);
-				
+
 				foreach ($deliveryIds as $item)
 				{
 					$result[$item->getId()]['NAME'] = $item->getName();
@@ -224,7 +154,8 @@ class Order
 		global $USER;
 
 		$userId = ($USER->GetID() != null)?$USER->GetID():1;
-		$basket = \Bitrix\Sale\Basket::loadItemsForFUser(\Bitrix\Sale\Fuser::getId(), \Bitrix\Main\Context::getCurrent()->getSite());
+		$basket = self::getBasketObject();
+
 		$order = \Bitrix\Sale\Order::create(SITE_ID, $userId);
 		$order->setPersonTypeId((int)$personTypeId);
 		$order->setBasket($basket);
@@ -233,7 +164,6 @@ class Order
 
 		$orderDeliveryLocation = $propertyCollection->getDeliveryLocation();
 		$orderDeliveryLocation->setValue($cityCode);
-
 
 		$shipmentCollection = $order->getShipmentCollection();
 
@@ -292,7 +222,7 @@ class Order
 		global $USER;
 
 		$userId = ($USER->GetID() != null)?$USER->GetID():1;
-		$basket = \Bitrix\Sale\Basket::loadItemsForFUser(\Bitrix\Sale\Fuser::getId(), \Bitrix\Main\Context::getCurrent()->getSite());
+		$basket = self::getBasketObject();
 
 		if(count($basket->getQuantityList()) < 1)
 			return ['success' => false, 'code' => 'basket'];
@@ -313,7 +243,7 @@ class Order
 			if(!empty($property))
 				$property->setValue($value);
 		}
-		
+
 		$shipmentCollection = $order->getShipmentCollection();
 
 		$shipment = $shipmentCollection->createItem(

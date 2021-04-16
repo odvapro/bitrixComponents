@@ -44,22 +44,53 @@ class Basket
 	public function getItemsArray()
 	{
 		$basketItems = self::getItemsObject();
-		$result      = [];
+		$products    = [];
+		$ids		 = [];
 
 		foreach ($basketItems as $basketItem)
 		{
 			$item = [];
 
-			$item['ID']               = $basketItem->getId();
-			$item['NAME']             = $basketItem->getField('NAME');
-			$item['PRODUCT_ID']       = $basketItem->getProductId();
-			$item['BASE_PRICE']       = $basketItem->getBasePrice();
-			$item['DISCOUNT_PRICE']   = $basketItem->getDiscountPrice();
-			$item['DISCOUNT_PERCENT'] = round(($basketItem->getDiscountPrice() * 100 / $basketItem->getBasePrice()), 0);
-			$item['PRICE']            = $basketItem->getPrice();
-			$item['QUANTITY']         = $basketItem->getQuantity();
+			$item['ID'] = $basketItem->getId();
+			$item['PRODUCT_ID'] = $basketItem->getProductId();
+			$item['PRICE'] = self::getProductPrice($basketItem);
+			$item['QUANTITY'] = $basketItem->getQuantity();
 
-			$result[$item['PRODUCT_ID']] 	  = $item;
+			$ids[] = $item['PRODUCT_ID'];
+
+			$products[$item['PRODUCT_ID']] = $item;
+		}
+
+		if(!empty($ids))
+			$result = self::fillElementsData($products, $ids);
+
+		return $result;
+	}
+
+	public function getProductPrice($product)
+	{
+		$price = [];
+
+		$price['BASE_PRICE'] = $product->getBasePrice();
+		$price['DISCOUNT_PRICE'] = $product->getDiscountPrice();
+		$price['DISCOUNT_PERCENT'] = round(($product->getDiscountPrice() * 100 / $product->getBasePrice()), 0);
+		$price['PRICE'] = $product->getPrice();
+
+		return $price;
+	}
+
+	public function fillElementsData($products, $ids)
+	{
+		$res = \CIBlockElement::GetList([], ['ID' => $ids], false, [], []);
+
+		$result = [];
+
+		while ($ob = $res->GetNextElement())
+		{
+			$product = $ob->GetFields();
+			$product['PROPERTIES'] = $ob->getProperties();
+
+			$result[$product['ID']] = array_merge($products[$product['ID']], $product);
 		}
 
 		return $result;

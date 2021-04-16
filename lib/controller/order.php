@@ -21,17 +21,11 @@ class Order extends Controller
 		];
 	}
 
-	public function getBasketAction($iblockId = 0)
+	public function getBasketAction()
 	{
-		if($iblockId <= 0)
-			$this->addError(new Error('Заполните это поле', 'iblockId'));
+		$result = \Odva\Module\Order::getBasket();
 
-		if(!empty($this->getErrors()))
-			return;
-
-		$result = \Odva\Module\Order::getBasket($iblockId);
-
-		if(empty($result))
+		if(empty($result['PRODUCTS']))
 			return $this->addError(new Error('Корзина пуста', 'global'));
 
 		return $result;
