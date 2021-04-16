@@ -20,10 +20,16 @@ class Element extends \CBitrixComponent
 		if(!Loader::includeModule('iblock'))
 			return false;
 
-		if(!array_key_exists('id', $params) && !array_key_exists('code', $params))
+		if(
+			!array_key_exists('id', $params)
+			&&
+			!array_key_exists('code', $params)
+			&&
+			!array_key_exists('filter', $params)
+		)
 		{
 			$this->errorCollection->setError(
-				new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT)
+				new Error('Необходимо передать один из параметров [id, code, filter]!', self::ERROR_TEXT)
 			);
 			return $params;
 		}
@@ -36,9 +42,37 @@ class Element extends \CBitrixComponent
 			return $params;
 		}
 
-		if(!array_key_exists('IBLOCK_ID', $params))
+		if(
+			!array_key_exists('id', $params)
+			&&
+			array_key_exists('code', $params)
+			&&
+			(!is_string($params['code']) || empty($params['code']))
+		)
 		{
-			$this->errorCollection->setError(new Error('Параметр "id" должен иметь числовое значение!', self::ERROR_TEXT));
+			$this->errorCollection->setError(
+				new Error('Параметр "code" должен иметь строковое значение!', self::ERROR_TEXT)
+			);
+			return $params;
+		}
+
+		if(
+			!array_key_exists('id', $params)
+			&&
+			!array_key_exists('code', $params)
+			&&
+			!is_array($params['filter'])
+		)
+		{
+			$this->errorCollection->setError(
+				new Error('Параметр "filter" должен быть массивом!', self::ERROR_TEXT)
+			);
+			return $params;
+		}
+
+		if(!array_key_exists('IBLOCK_ID', $params) && empty($params['filter']['IBLOCK_ID']))
+		{
+			$this->errorCollection->setError(new Error('Необходимо передать параметр "IBLOCK_ID"!', self::ERROR_TEXT));
 			return $params;
 		}
 
@@ -53,6 +87,9 @@ class Element extends \CBitrixComponent
 
 		if(!array_key_exists('code', $params))
 			$params['code'] = false;
+
+		if(!array_key_exists('filter', $params))
+			$params['filter'] = false;
 
 		if(!array_key_exists('props', $params) || !is_array($params['props']))
 			$params['props'] = false;
@@ -82,18 +119,33 @@ class Element extends \CBitrixComponent
 		if ($this->hasErrors())
 			return $this->processErrors();
 
-
 		if($this->arParams['id'])
 			$arFilter = ['IBLOCK_ID'=>$this->arParams['IBLOCK_ID'], 'ID'=> $this->arParams['id']];
-		else
+		else if($this->arParams['code'])
 			$arFilter = ['IBLOCK_ID'=>$this->arParams['IBLOCK_ID'], 'CODE'=> $this->arParams['code']];
+		else
+		{
+			if(!empty($this->arParams['IBLOCK_ID']))
+				$this->arParams['filter']['IBLOCK_ID'] = $this->arParams['IBLOCK_ID'];
 
-		$element = CIBlockElement::GetList([], $arFilter)->Fetch();
+			$arFilter = $this->arParams['filter'];
+		}
+
+		$element = CIBlockElement::GetList([], $arFilter)->GetNext();
 
 		if(!$element)
 		{
-			$this->errorCollection->setError(new Error("Елемент не найден.", self::ERROR_404));
-			return $this->processErrors();
+			if(empty($this->arParams['set_code_404']) || $this->arParams['set_code_404'] != 'N')
+				$this->errorCollection->setError(new Error("Елемент не найден.", self::ERROR_404));
+			else
+				$this->errorCollection->setError(new Error("Елемент не найден.", self::ERROR_TEXT));
+
+			$this->arResult = false;
+
+			if(empty($this->arParams['show_errors']) || $this->arParams['show_errors'] != 'N')
+				return $this->processErrors();
+			else
+				return $this->includeComponentTemplate();
 		}
 
 		if($this->arParams['images'])
@@ -366,7 +418,11 @@ class Element extends \CBitrixComponent
 						false
 					);
 				}
-				elseif ($code == self::ERROR_TEXT)
+				elseif (
+					$code == self::ERROR_TEXT
+					&&
+					(empty($this->arParams['show_errors']) || $this->arParams['show_errors'] != 'N')
+				)
 				{
 					ShowError($error->getMessage());
 				}
