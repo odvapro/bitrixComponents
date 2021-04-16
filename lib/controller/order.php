@@ -25,9 +25,6 @@ class Order extends Controller
 	{
 		$result = \Odva\Module\Order::getBasket();
 
-		if(empty($result['PRODUCTS']))
-			return $this->addError(new Error('Корзина пуста', 'global'));
-
 		return $result;
 	}
 

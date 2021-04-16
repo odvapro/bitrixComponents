@@ -44,6 +44,7 @@ class Basket
 	public function getItemsArray()
 	{
 		$basketItems = self::getItemsObject();
+		$result 	 = [];
 		$products    = [];
 		$ids		 = [];
 
