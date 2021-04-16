@@ -236,8 +236,11 @@ class Order
 
 		$propertyCollection = $order->getPropertyCollection();
 
-		$orderDeliveryLocation = $propertyCollection->getDeliveryLocation();
-		$orderDeliveryLocation->setValue($cityCode);
+		if($cityCode)
+		{
+			$orderDeliveryLocation = $propertyCollection->getDeliveryLocation();
+			$orderDeliveryLocation->setValue($cityCode);
+		}
 
 		foreach ($props as $key => $value)
 		{
