@@ -1,14 +1,7 @@
-import Observer from './core/observer';
+import Base from './base.js';
 
-class OdvaOrder extends Observer
+class OdvaOrder extends Base
 {
-	constructor()
-	{
-		super();
-
-		this.eventScope = 'order';
-	}
-
 	async getBasket()
 	{
 		let response = await this.getResponse('getBasket');
@@ -64,27 +57,6 @@ class OdvaOrder extends Observer
 		this.notify('makeOrder', response);
 		return response;
 	}
-
-	async getResponse(action, data = {}, config)
-	{
-		let defaultConfig = {
-			dataType : 'json',
-			method   : 'POST'
-		};
-
-		config = config || {};
-		config = $.extend(defaultConfig, config);
-
-		config.url  = this.makeApiUrl(action);
-		config.data = config.data || data;
-
-		return await $.ajax(config);
-	}
-
-	makeApiUrl(action)
-	{
-		return `/bitrix/services/main/ajax.php?action=odva:module.api.${this.eventScope}.${action}`;
-	}
 }
 
-export default new OdvaOrder();
+export default new OdvaOrder('order');

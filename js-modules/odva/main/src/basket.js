@@ -1,17 +1,10 @@
-import Observer from './core/observer';
+import Base from './base';
 
 /**
  * класс для работы с корзиной
  */
-class OdvaBasket extends Observer
+class OdvaBasket extends Base
 {
-	constructor()
-	{
-		super();
-
-		this.eventScope = 'basket';
-	}
-
 	/**
 	 * получение количества товаров в корзине
 	 *
@@ -19,7 +12,7 @@ class OdvaBasket extends Observer
 	 */
 	async getCount()
 	{
-		let response = await this.getResponse('getCount', false, {method: 'GET'});
+		let response = await this.request.send('getCount', false, {method: 'GET'});
 		this.notify('getCount', response);
 		return response;
 	}
@@ -29,7 +22,7 @@ class OdvaBasket extends Observer
 	 */
 	async clear()
 	{
-		let response = await this.getResponse('clear', false, {method: 'GET'});
+		let response = await this.request.send('clear', false, {method: 'GET'});
 		this.notify('clear', response);
 		return response;
 	}
@@ -42,7 +35,7 @@ class OdvaBasket extends Observer
 	 */
 	async addItem(productId, quantity)
 	{
-		let response = await this.getResponse('addItem', {productId: productId, quantity: quantity});
+		let response = await this.request.send('addItem', {productId: productId, quantity: quantity});
 		this.notify('addItem', response);
 		return response;
 	}
@@ -54,7 +47,7 @@ class OdvaBasket extends Observer
 	 */
 	async deleteItem(productId)
 	{
-		let response = await this.getResponse('deleteItem', {productId: productId});
+		let response = await this.request.send('deleteItem', {productId: productId});
 		this.notify('deleteItem', response);
 		return response;
 	}
@@ -67,52 +60,31 @@ class OdvaBasket extends Observer
 	 */
 	async changeItemQuantity(productId, quantity)
 	{
-		let response = await this.getResponse('changeItemQuantity', {productId: productId, quantity: quantity});
+		let response = await this.request.send('changeItemQuantity', {productId: productId, quantity: quantity});
 		this.notify('changeItemQuantity', response);
 		return response;
 	}
 
 	async applyCoupon(coupon)
 	{
-		let response = await this.getResponse('applyCoupon', {coupon: coupon});
+		let response = await this.request.send('applyCoupon', {coupon: coupon});
 		this.notify('applyCoupon', response);
 		return response;
 	}
 
 	async deleteCoupon(coupon)
 	{
-		let response = await this.getResponse('deleteCoupon', {coupon: coupon});
+		let response = await this.request.send('deleteCoupon', {coupon: coupon});
 		this.notify('deleteCoupon', response);
 		return response;
 	}
 
 	async getInfo()
 	{
-		let response = await this.getResponse('getInfo');
+		let response = await this.request.send('getInfo');
 		this.notify('getInfo', response);
 		return response;
 	}
-
-	async getResponse(action, data = {}, config)
-	{
-		let defaultConfig = {
-			dataType : 'json',
-			method   : 'POST'
-		};
-
-		config = config || {};
-		config = $.extend(defaultConfig, config);
-
-		config.url  = this.makeApiUrl(action);
-		config.data = config.data || data;
-
-		return await $.ajax(config);
-	}
-
-	makeApiUrl(action)
-	{
-		return `/bitrix/services/main/ajax.php?action=odva:module.api.${this.eventScope}.${action}`;
-	}
 }
 
-export default new OdvaBasket();
+export default new OdvaBasket('basket');

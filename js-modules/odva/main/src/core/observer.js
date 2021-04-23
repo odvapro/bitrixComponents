@@ -45,6 +45,6 @@ class Observer
 
 		return `${this.eventScope}${eventType}Event`;
 	}
-}
+};
 
 export default Observer;
