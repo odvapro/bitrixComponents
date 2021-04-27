@@ -3,10 +3,10 @@
  */
 class Observer
 {
-	constructor()
+	constructor(scope)
 	{
 		this.subscribers = [];
-		this.eventScope  = 'default';
+		this.eventScope  = scope || 'default';
 	}
 
 	/**
