@@ -13,11 +13,19 @@ class OdvaUser extends Base
 		return response;
 	}
 
-	async register(login, name, lastname, password, confirm, email)
+	async register(login, name, lastname, password, confirm, email, additional=[])
 	{
 		let response = await this.request.send(
 			'register',
-			{login: login, name: name, lastname: lastname, password: password, confirm: confirm, email: email},
+			{
+				login      : login,
+				name       : name,
+				lastname   : lastname,
+				password   : password,
+				confirm    : confirm,
+				email      : email,
+				additional : additional
+			},
 			{method: 'POST'}
 		);
 		this.notify('register', response);

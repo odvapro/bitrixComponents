@@ -89,8 +89,15 @@ class User extends Controller
 		return [$arFields, $user];
 	}
 
-	public function registerAction($login='', $name='', $lastname='', $password='', $confirm='', $email='')
+	public function registerAction()
 	{
+		$login    = $this->getRequest()->getPost('login');
+		$name     = $this->getRequest()->getPost('name');
+		$lastname = $this->getRequest()->getPost('lastname');
+		$password = $this->getRequest()->getPost('password');
+		$confirm  = $this->getRequest()->getPost('confirm');
+		$email    = $this->getRequest()->getPost('email');
+
 		global $USER;
 
 		if($USER->IsAuthorized())
@@ -128,7 +135,21 @@ class User extends Controller
 			return false;
 		}
 
-		return true;
+		$additional = $this->getRequest->getPost('additional');
+
+		if(empty($additional) || !is_array($additional))
+			return true;
+
+		$update = $USER->Update($USER->GetID(), $additional);
+
+		if($update)
+			return true;
+
+		$errors = explode('<br>', $USER->LAST_ERROR);
+
+		$this->addError(new Error($errors[0], 'global'));
+
+		return false;
 	}
 
 	public function loginAction($login='', $password='', $remember='N')
