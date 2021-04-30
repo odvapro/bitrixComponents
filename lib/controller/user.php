@@ -126,27 +126,34 @@ class User extends Controller
 		if(!empty($this->getErrors()))
 			return false;
 
-		$result = $USER->Register($login, $name, $lastname, $password, $confirm, $email);
+		$userData = [
+			'LOGIN'            => $login,
+			'NAME'             => $name,
+			'LAST_NAME'        => $lastname,
+			'PASSWORD'         => $password,
+			'CONFIRM_PASSWORD' => $confirm,
+			'EMAIL'            => $email
+		];
 
-		if($result['TYPE'] == 'ERROR')
+		$additional = $this->getRequest()->getPost('additional');
+
+		if(!empty($additional) && is_array($additional))
+			foreach ($additional as $field => $value)
+				$userData[$field] = $value;
+
+		$userId = $USER->Add($userData);
+
+		if(intval($userId) > 0)
 		{
-			$errors = explode('<br>', $result['MESSAGE']);
-			$this->addError(new Error($errors[0], 'global'));
-			return false;
+			$authorize = $this->getRequest()->getPost('authorize');
+
+			if(!empty($authorize))
+				$USER->Authorize($userId);
+
+			return true;
 		}
 
-		$additional = $this->getRequest->getPost('additional');
-
-		if(empty($additional) || !is_array($additional))
-			return true;
-
-		$update = $USER->Update($USER->GetID(), $additional);
-
-		if($update)
-			return true;
-
 		$errors = explode('<br>', $USER->LAST_ERROR);
-
 		$this->addError(new Error($errors[0], 'global'));
 
 		return false;
