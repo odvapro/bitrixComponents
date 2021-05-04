@@ -135,6 +135,17 @@ class SmartFilter extends CBitrixComponent
 		foreach ($this->arResult['ITEMS'] as $propertyId => $property)
 			$filter[$property->getFilterCode()] = $property;
 
+		usort(
+			$filter,
+			function($a, $b)
+			{
+				if ($a->sort == $b->sort)
+					return 0;
+
+				return ($a->sort < $b->sort) ? -1 : 1;
+			}
+		);
+
 		$this->arResult['ITEMS'] = $filter;
 		unset($filter);
 	}
@@ -195,7 +206,8 @@ class SmartFilter extends CBitrixComponent
 				[
 					'ID' => 1,
 					'NAME' => $this->arParams['PRICE']['TITLE'],
-					'CODE' => $this->arParams['PRICE']['FIELD']
+					'CODE' => $this->arParams['PRICE']['FIELD'],
+					'SORT' => $this->arParams['PRICE']['SORT']
 				],
 				[],
 				false,
