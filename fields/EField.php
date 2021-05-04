@@ -21,7 +21,6 @@ class EField extends BaseField
 		$rsPropertyEnums = CIBlockElement::GetList([], ['IBLOCK_ID' => $iblock_link, 'ID' => $propertiesId], false, false,['NAME', 'ID']);
 		while($enumField = $rsPropertyEnums->Fetch())
 			$this->valuesData[$enumField['ID']] = $enumField;
-		
 	}
 
 	public function getDisplayValue($facetValue)
@@ -36,7 +35,7 @@ class EField extends BaseField
 
 	public function getFilterData()
 	{
-		$filter = ['propertyCode' => "PROPERTY_{$this->code}_VALUE", 'filter' => []];
+		$filter = ['propertyCode' => "PROPERTY_{$this->code}.NAME", 'filter' => []];
 
 		foreach ($this->filter as $filterValue)
 		{
