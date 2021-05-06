@@ -40,7 +40,7 @@ class Favorites
 
 		$_SESSION['FAVORITES'][] = $id;
 
-		return ['favorites' => $_SESSION['FAVORITES']];
+		return ['favorites' => $_SESSION['FAVORITES'], 'added' => $id];
 	}
 
 	public static function get()
@@ -93,7 +93,7 @@ class Favorites
 
 		$_SESSION['FAVORITES'] = $favorites;
 
-		return ['favorites' => $_SESSION['FAVORITES']];
+		return ['favorites' => $_SESSION['FAVORITES'], 'deleted' => $id];
 	}
 
 	public static function deleteAll()

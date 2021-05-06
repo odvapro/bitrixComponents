@@ -19,7 +19,15 @@ class Favorites extends Controller
 
 	public function addAction($id = 0)
 	{
-		return \Odva\Module\Favorites::add($id);
+		$result = \Odva\Module\Favorites::add($id);
+
+		if(is_a($result, '\Bitrix\Main\Error'))
+		{
+			$this->addError($result);
+			return false;
+		}
+
+		return $result;
 	}
 
 	public function getAction()
@@ -29,7 +37,15 @@ class Favorites extends Controller
 
 	public function deleteAction($id = 0)
 	{
-		return \Odva\Module\Favorites::delete($id);
+		$result = \Odva\Module\Favorites::delete($id);
+
+		if(is_a($result, '\Bitrix\Main\Error'))
+		{
+			$this->addError($result);
+			return false;
+		}
+
+		return $result;
 	}
 
 	public function deleteAllAction()
