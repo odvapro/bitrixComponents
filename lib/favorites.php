@@ -16,11 +16,6 @@ class Favorites
 		if($id <= 0)
 			return new Error('Не правильно передан параметр id');
 
-		global $USER;
-
-		if(!$USER->IsAuthorized())
-			return new Error('Для добавления товара в избранное необходимо авторизоваться');
-
 		$favorites = self::get();
 
 		if(in_array($id, $favorites))
@@ -28,15 +23,20 @@ class Favorites
 
 		$favorites[] = $id;
 
-		$update = $USER->Update(
-			$USER->GetParam('USER_ID'),
-			[
-				self::$favoritesField => implode(',', $favorites)
-			]
-		);
+		global $USER;
 
-		if(!$update)
-			return new Error($USER->LAST_ERROR);
+		if($USER->IsAuthorized())
+		{
+			$update = $USER->Update(
+				$USER->GetParam('USER_ID'),
+				[
+					self::$favoritesField => implode(',', $favorites)
+				]
+			);
+
+			if(!$update)
+				return new Error($USER->LAST_ERROR);
+		}
 
 		$_SESSION['FAVORITES'][] = $id;
 
@@ -45,12 +45,12 @@ class Favorites
 
 	public static function get()
 	{
+		if(!array_key_exists('FAVORITES', $_SESSION))
+			$_SESSION['FAVORITES'] = [];
+
 		global $USER;
 
-		if(!$USER->IsAuthorized())
-			return [];
-
-		if(!empty($_SESSION['FAVORITES']))
+		if(!empty($_SESSION['FAVORITES']) || !$USER->IsAuthorized())
 			return $_SESSION['FAVORITES'];
 
 		$rsUser = \Bitrix\Main\UserTable::GetByID($USER->GetParam('USER_ID'));
@@ -66,30 +66,30 @@ class Favorites
 
 	public static function delete($id = 0)
 	{
-		global $USER;
-
 		$favorites = self::get();
 
-		if(!$USER->IsAuthorized())
+		if(empty($favorites) || !in_array($id, $favorites))
 			return ['favorites' => $favorites];
 
 		$id    = intval($id);
 		$index = array_search($id, $favorites);
 
-		if($index === false)
-			return ['favorites' => $favorites];
-
 		array_splice($favorites, $index, 1);
 
-		$update = $USER->Update(
-			$USER->GetParam('USER_ID'),
-			[
-				self::$favoritesField => implode(',', $favorites)
-			]
-		);
+		global $USER;
 
-		if(!$update)
-			return new Error($USER->LAST_ERROR);
+		if($USER->IsAuthorized())
+		{
+			$update = $USER->Update(
+				$USER->GetParam('USER_ID'),
+				[
+					self::$favoritesField => implode(',', $favorites)
+				]
+			);
+
+			if(!$update)
+				return new Error($USER->LAST_ERROR);
+		}
 
 		$_SESSION['FAVORITES'] = $favorites;
 
@@ -98,22 +98,26 @@ class Favorites
 
 	public static function deleteAll()
 	{
-		global $USER;
 
 		$favorites = self::get();
 
-		if(!$USER->IsAuthorized())
-			return ['favorites' => $favorites];
+		if(empty($favorites))
+			return ['favorites' => []];
 
-		$update = $USER->Update(
-			$USER->GetParam('USER_ID'),
-			[
-				self::$favoritesField => ""
-			]
-		);
+		global $USER;
 
-		if(!$update)
-			return new Error($USER->LAST_ERROR);
+		if($USER->IsAuthorized())
+		{
+			$update = $USER->Update(
+				$USER->GetParam('USER_ID'),
+				[
+					self::$favoritesField => ""
+				]
+			);
+
+			if(!$update)
+				return new Error($USER->LAST_ERROR);
+		}
 
 		$_SESSION['FAVORITES'] = [];
 

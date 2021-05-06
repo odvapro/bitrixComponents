@@ -13,6 +13,7 @@ class User extends Controller
 			'login'    => ['prefilters' => []],
 			'ulogin'   => ['prefilters' => []],
 			'register' => ['prefilters' => []],
+			'logout'   => ['prefilters' => []],
 		];
 	}
 
@@ -171,19 +172,42 @@ class User extends Controller
 			return [];
 
 		global $USER;
-		if (!is_object($USER)) $USER = new CUser;
+		if (!is_object($USER)) $USER = new \CUser;
+
+		$dbUser = \CUser::GetByLogin($login)->Fetch();
+
+		if(empty($dbUser))
+		{
+			$this->addError(new Error('Пользователь не найден', 'login'));
+			return [];
+		}
+
+		if(!\Bitrix\Main\Security\Password::equals($dbUser['PASSWORD'], $password))
+		{
+			$this->addError(new Error('Не правильный логин или пароль', 'login'));
+			$this->addError(new Error('Не правильный логин или пароль', 'password'));
+			return [];
+		}
 
 		if($remember !== 'N' && $remember !== 'Y')
 			$remember = 'N';
 
-		$result = $USER->Login($login, $password, $remember);
+		$remember = $remember === 'Y';
 
-		if($result === true)
+		$USER->Authorize($dbUser['ID'], $remember);
+
+		return true;
+	}
+
+	public function logoutAction()
+	{
+		global $USER;
+
+		if(!$USER->IsAuthorized())
 			return true;
 
-		$errors = explode('<br>', $result['MESSAGE']);
-		$this->addError(new Error($errors[0], 'global'));
+		$USER->Logout();
 
-		return false;
+		return true;
 	}
 }
