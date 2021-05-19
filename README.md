@@ -48,7 +48,8 @@ $filter = $APPLICATION->IncludeCOmponent(
 			'TITLE' => 'Цена',
 			'FIELD' => 'price'
 		],
-		'FILTER_URL' => $_GET['_filter']
+		'FILTER_URL' => $_GET['_filter'],
+		'ADDITIONAL_PROPERTIES' => ['>CATALOG_QUANTITY', 'PROPERTY_BESTSALLER_VALUE']
 	]
 );
 
