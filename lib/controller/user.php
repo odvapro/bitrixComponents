@@ -10,10 +10,11 @@ class User extends Controller
 	public function configureActions()
 	{
 		return [
-			'login'    => ['prefilters' => []],
-			'ulogin'   => ['prefilters' => []],
-			'register' => ['prefilters' => []],
-			'logout'   => ['prefilters' => []],
+			'login'          => ['prefilters' => []],
+			'ulogin'         => ['prefilters' => []],
+			'register'       => ['prefilters' => []],
+			'logout'         => ['prefilters' => []],
+			'forgotPassword' => ['prefilters' => []],
 		];
 	}
 
@@ -207,6 +208,42 @@ class User extends Controller
 			return true;
 
 		$USER->Logout();
+
+		return true;
+	}
+
+	public function forgotPasswordAction($email)
+	{
+		global $USER;
+
+		if($USER->IsAuthorized())
+		{
+			$this->addError(new Error('Вы уже авторизованы', 'email'));
+			return false;
+		}
+
+		if(!check_email($email))
+		{
+			$this->addError(new Error('Некорректный email', 'email'));
+			return false;
+		}
+
+		$user = CUser::GetList([], ['EMAIL' => $email])->Fetch();
+
+		if(!$user)
+		{
+			$this->addError(new Error('Пользователь не найден', 'email'));
+			return false;
+		}
+
+		$res = CUser::SendPassword($user['LOGIN'], $user['EMAIL']);
+
+		if($res['TYPE'] == 'ERROR')
+		{
+			$errors = explode('<br>', $res['MESSAGE']);
+			$this->addError(new Error($errors[0], 'email'));
+			return false;
+		}
 
 		return true;
 	}

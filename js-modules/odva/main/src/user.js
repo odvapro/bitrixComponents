@@ -13,6 +13,24 @@ class OdvaUser extends Base
 		return response;
 	}
 
+	async logout()
+	{
+		let response = await this.request.send('logout');
+		this.notify('logout', response);
+		return response;
+	}
+
+	async forgotPassword(email)
+	{
+		let response = await this.request.send(
+			'forgotPassword',
+			{email: email},
+			{method: 'POST'}
+		);
+		this.notify('forgotPassword', response);
+		return response;
+	}
+
 	async register(login, name, lastname, password, confirm, email, additional=[], authorize=true)
 	{
 		let response = await this.request.send(
