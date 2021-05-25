@@ -228,7 +228,7 @@ class User extends Controller
 			return false;
 		}
 
-		$user = CUser::GetList([], ['EMAIL' => $email])->Fetch();
+		$user = \CUser::GetList(($by='id'), ($order='asc'), ['EMAIL' => $email])->Fetch();
 
 		if(!$user)
 		{
@@ -236,7 +236,7 @@ class User extends Controller
 			return false;
 		}
 
-		$res = CUser::SendPassword($user['LOGIN'], $user['EMAIL']);
+		$res = \CUser::SendPassword($user['LOGIN'], $user['EMAIL']);
 
 		if($res['TYPE'] == 'ERROR')
 		{
@@ -245,6 +245,8 @@ class User extends Controller
 			return false;
 		}
 
-		return true;
+		$res['MESSAGE'] = explode('<br>', $res['MESSAGE']);
+
+		return $res['MESSAGE'][0];
 	}
 }
