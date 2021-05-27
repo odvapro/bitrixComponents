@@ -33,6 +33,7 @@
 
 ***Чтобы свойство работало, обязательно нужно указать свойству символьный код (CODE).***
 
+Если, есть свойства, которые необходимо отобразить в фильтре, но для них нельзя включить фасетные индексы, то их можно передать в параметре **ADDITIONAL_PROPERTIES**
 ### Пример подключения фильтра
 
 ```php
@@ -47,7 +48,8 @@ $filter = $APPLICATION->IncludeCOmponent(
 			'TITLE' => 'Цена',
 			'FIELD' => 'price'
 		],
-		'FILTER_URL' => $_GET['_filter']
+		'FILTER_URL' => $_GET['_filter'],
+		'ADDITIONAL_PROPERTIES' => ['>CATALOG_QUANTITY', 'PROPERTY_BESTSALLER_VALUE']
 	]
 );
 
