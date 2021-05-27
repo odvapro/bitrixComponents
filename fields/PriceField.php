@@ -8,12 +8,13 @@ class PriceField extends BaseField
 	{
 		$values = $this->getValues();
 
-		$filter = [
-			'propertyCode' => "><{$this->code}",
-			'filter'       => [
-				$values['FROM'], $values['TO']
-			]
-		];
+		$filter = ['propertyCode' => "><{$this->code}", 'filter' => []];
+
+		if($values['MIN'] == $values['FROM'] && $values['MAX'] == $values['TO'])
+			return $filter;
+
+		$filter['filter'] = [$values['FROM'], $values['TO']];
+
 		return $filter;
 	}
 
