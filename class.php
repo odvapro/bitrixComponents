@@ -65,6 +65,9 @@ class Elements extends CBitrixComponent
 	{
 		$selectParams = ['*'];
 
+		if(!empty($this->arParams['load_catalog_fields']))
+			$selectParams[] = 'CATALOG_QUANTITY';
+
 		if(!empty($this->arParams['product']['props']))
 		{
 			$selectParams[] = "PROPERTY_CML2_LINK.ID";
