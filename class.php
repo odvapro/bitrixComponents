@@ -204,7 +204,7 @@ class SmartFilter extends CBitrixComponent
 			$this->addFieldClass(
 				'PriceField',
 				[
-					'ID' => 1,
+					'ID'   => $this->arParams['PRICE']['ID'] ? $this->arParams['PRICE']['ID'] : '1',
 					'NAME' => $this->arParams['PRICE']['TITLE'],
 					'CODE' => $this->arParams['PRICE']['FIELD'],
 					'SORT' => $this->arParams['PRICE']['SORT']
