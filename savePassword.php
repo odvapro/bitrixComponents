@@ -14,31 +14,34 @@ foreach ($needFields as $fieldCode)
 {
 	if(empty($_POST[$fieldCode]))
 	{
-		echo json_encode(['success'=>false,'msg'=>'not all fields']);
+		echo json_encode(['success'=>false,'msg'=>'not all fields', 'field' => $fieldCode]);
 		die();
 	}
 }
 
-$rsUser = CUser::GetByID($USER->GetID());
-$arUser = $rsUser->Fetch();
+$rsUser  = CUser::GetByID($USER->GetID());
+$arUser  = $rsUser->Fetch();
 $profile = new Profile;
 
-if(!$profile->isUserPassword($USER->GetID(),$_POST['password']))
+if(!$profile->isUserPassword($USER->GetLogin(),$_POST['password']))
 {
-	echo json_encode(['success'=>false,'msg'=>'not orirginal password']);
+	echo json_encode(['success'=>false,'msg'=>'not orirginal password', 'field' => 'password']);
 	exit();
 }
-$fields = Array(
-  "ACTIVE"            => "Y",
-  "PASSWORD"          => $_POST['newpassword'],
-  "CONFIRM_PASSWORD"  => $_POST['confirm'],
-  );
+
+$fields = [
+	"ACTIVE"            => "Y",
+	"PASSWORD"          => $_POST['newpassword'],
+	"CONFIRM_PASSWORD"  => $_POST['confirm'],
+];
+
 $USER->Update($USER->GetID(), $fields);
+
 if(!$USER->LAST_ERROR)
 {
 	echo json_encode(['success' => true,'msg' => 'пароль успешно изменен']);
 }
 else
 {
-	echo json_encode(['success' => false,'msg' => $USER->LAST_ERROR]);
+	echo json_encode(['success' => false,'msg' => $USER->LAST_ERROR, 'field' => 'global']);
 }
