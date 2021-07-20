@@ -7,6 +7,12 @@ class Orders extends CBitrixComponent
 		if(!\Bitrix\Main\Loader::includeModule("iblock") || !\Bitrix\Main\Loader::IncludeModule("sale"))
 			return;
 
+		if(empty($this->arParams['filter']))
+		{
+			global $USER;
+			$this->arParams['filter'] = ['USER_ID' => $USER->GetID()];
+		}
+
 		$dbSales = CSaleOrder::GetList(["DATE_INSERT" => "DESC"], $this->arParams['filter']);
 		$orders = [];
 		while ($arSales = $dbSales->Fetch())
