@@ -19,10 +19,16 @@ class Orders extends CBitrixComponent
 			$arSales['PRODUCTS']           = $this->getProducts($arSales['ID']);
 			$arSales['PRODUCT_IDS']        = array_column($arSales['PRODUCTS'], 'PRODUCT_ID');
 			$arSales['PROPERTIES']         = $this->getOrderProps($arSales['ID']);
+			$arSales['USER']               = $this->getOrderUser($arSales['USER_ID']);
 			$orders[] = $arSales;
 		}
 		$this->arResult['ORDERS'] =$orders;
 		$this->includeComponentTemplate();
+	}
+
+	public function getOrderUser($id)
+	{
+		return \CUser::GetByID($id)->Fetch();
 	}
 
 	/**
