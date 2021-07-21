@@ -131,7 +131,21 @@ class Element extends \CBitrixComponent
 			$arFilter = $this->arParams['filter'];
 		}
 
-		$element = CIBlockElement::GetList([], $arFilter)->GetNext();
+		if($this->arParams['load_product_fields'])
+		{
+			$arSelect = [
+				'*',
+				'TYPE',
+				'AVAILABLE',
+				'QUANTITY',
+				'QUANTITY_RESERVED',
+				'CAN_BUY_ZERO',
+			];
+		}
+		else
+			$arSelect = ['*'];
+
+		$element = CIBlockElement::GetList([], $arFilter, false, false, $arSelect)->GetNext();
 
 		if(!$element)
 		{
