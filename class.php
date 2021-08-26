@@ -76,10 +76,13 @@ class SmartFilter extends CBitrixComponent
 		foreach ($this->arParams['ADDITIONAL_PROPERTIES'] as $properties)
 		{
 			$propertiesName = html_entity_decode($properties);
-			
+
 			if(!empty($parsedFilter[$properties]))
 				$filter['products'][$propertiesName] = $parsedFilter[$properties];
 		}
+
+		if(!empty($this->arParams['PREFILTER']))
+			$filter['products'] = array_merge($this->arParams['PREFILTER'], $filter['products']);
 
 		return $filter;
 	}
@@ -92,6 +95,8 @@ class SmartFilter extends CBitrixComponent
 			"ACTIVE_DATE"       => "Y",
 			"CHECK_PERMISSIONS" => "Y",
 		];
+		if(!empty($this->arParams['PREFILTER']))
+			$facetFilter = array_merge($this->arParams['PREFILTER'], $facetFilter);
 
 		$facets = $this->getFacets($facetFilter);
 
