@@ -5,6 +5,7 @@ abstract class BaseField
 	public $id;
 	public $name;
 	public $code;
+	public $sort;
 
 	protected $settings;
 	protected $values;
@@ -19,22 +20,23 @@ abstract class BaseField
 
 	public function __construct($property, $propertyLink, $isSkuProperty = false, $params=[])
 	{
-		$this->id            = $property['ID'];
-		$this->name          = $property["NAME"];
-		$this->code          = $property["CODE"];
+		$this->id             = $property['ID'];
+		$this->name           = $property["NAME"];
+		$this->code           = $property["CODE"];
+		$this->sort           = $property["SORT"];
 		$this->link_iblock_id = $property['LINK_IBLOCK_ID'];
-		$this->values        = [];
-		$this->dictionary    = [];
-		$this->filter        = [];
-		$this->isSkuProperty = $isSkuProperty;
-		$this->settings      = [
+		$this->values         = [];
+		$this->dictionary     = [];
+		$this->filter         = [];
+		$this->isSkuProperty  = $isSkuProperty;
+		$this->settings       = [
 			'USER_TYPE'          => $property["USER_TYPE"],
 			'USER_TYPE_SETTINGS' => $property["USER_TYPE_SETTINGS"],
 			'DISPLAY_TYPE'       => $propertyLink['DISPLAY_TYPE'],
 			'DISPLAY_EXPANDED'   => $propertyLink["DISPLAY_EXPANDED"] ?? 'N',
 		];
 
-		$this->params        = $params;
+		$this->params         = $params;
 	}
 
 	public function isSkuProperty()
