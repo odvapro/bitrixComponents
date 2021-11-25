@@ -132,7 +132,11 @@ class Elements extends CBitrixComponent
 		if($this->arParams['pagn_id'])
 		{
 			$this->arResult['NAV_OBJECT'] = new \Bitrix\Main\UI\PageNavigation($this->arParams['pagn_id']);
-			$this->arResult['NAV_OBJECT']->initFromUri();
+
+			if(!empty($this->arParams['page']))
+				$this->arResult['NAV_OBJECT']->setCurrentPage($this->arParams['page']);
+			else
+				$this->arResult['NAV_OBJECT']->initFromUri();
 
 			if($this->arParams['count'])
 				$this->arResult['NAV_OBJECT']->setPageSize($this->arParams['count']);
@@ -166,6 +170,8 @@ class Elements extends CBitrixComponent
 				}
 			}
 		}
+
+		$this->arResult['NAV_PARAMS']['checkOutOfRange'] = true;
 	}
 
 	public function makeResult()
