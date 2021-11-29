@@ -20,7 +20,7 @@ class OdvaSections extends CBitrixComponent
 			$params['select'] = [];
 
 		if(empty($params['count']) || intval($params['count']) <= 0)
-			$params['nav_params'] = ['nTopCount' => false];
+			$params['nav_params'] = false;
 		else
 			$params['nav_params'] = ['nTopCount' => intval($params['count'])];
 
