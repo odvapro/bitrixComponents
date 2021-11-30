@@ -25,13 +25,22 @@ class Elements extends CBitrixComponent
 
 		$paramsValidatorDefaults = [
 			'sort'   => ['SORT' => 'ASC'],
-			'filter' => []
+			'filter' => [],
+			'props'  => [],
 		];
 
 		foreach ($paramsValidatorRules as $field => $rules)
 		{
 			$defaults = array_key_exists($field, $paramsValidatorDefaults) ? $paramsValidatorDefaults[$field] : false;
 			$arParams[$field] = ElementsParamsValidator::validate($field, $arParams, $rules, $defaults);
+		}
+
+		$arParams['CACHE_TYPE'] = 'N';
+
+		if(!empty($arParams['CACHE_TIME']) && intval($arParams['CACHE_TIME']) > 0)
+		{
+			$arParams['CACHE_TIME'] = intval($arParams['CACHE_TIME']);
+			$arParams['CACHE_TYPE'] = 'A';
 		}
 
 		return $arParams;
@@ -42,13 +51,16 @@ class Elements extends CBitrixComponent
 		if(!\Bitrix\Main\Loader::includeModule("iblock"))
 			return;
 
-		$this->initParams();
-		$this->makeResult();
+		if($this->StartResultCache())
+		{
+			$this->initParams();
+			$this->makeResult();
 
-		if(defined('COMPONENT_RETURN_RESULT') && COMPONENT_RETURN_RESULT === true)
-			return $this->arResult;
+			if(defined('COMPONENT_RETURN_RESULT') && COMPONENT_RETURN_RESULT === true)
+				return $this->arResult;
 
-		$this->IncludeComponentTemplate();
+			$this->IncludeComponentTemplate();
+		}
 	}
 
 	private function initParams()
