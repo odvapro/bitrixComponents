@@ -91,7 +91,7 @@ class Elements extends CBitrixComponent
 
 		foreach ($this->arParams['filter'] as $paramName => $paramValue)
 		{
-			if(in_array($paramName, $this->arParams['props']))
+			if(in_array($paramName, $this->arParams['props']) && !empty($paramName))
 				$filterParams["PROPERTY_{$paramName}"] = $paramValue;
 			else
 				$filterParams[$paramName] = $paramValue;
