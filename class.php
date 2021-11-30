@@ -43,8 +43,32 @@ class OdvaSections extends CBitrixComponent
 		$this->arResult['SECTIONS'] = [];
 
 		while($section = $res->Fetch())
+		{
+			if(!empty($this->arParams['load_urls']))
+				$section = $this->processUrls($section);
+
 			$this->arResult['SECTIONS'][] = $section;
+		}
 
 		$this->IncludeComponentTemplate();
+	}
+
+	private function processUrls($section)
+	{
+		$section['LIST_PAGE_URL'] = \CIBlock::ReplaceDetailUrl(
+			$section['LIST_PAGE_URL'],
+			$section,
+			true,
+			false
+		);
+
+		$section['SECTION_PAGE_URL'] = \CIBlock::ReplaceDetailUrl(
+			$section['SECTION_PAGE_URL'],
+			$section,
+			true,
+			false
+		);
+
+		return $section;
 	}
 }

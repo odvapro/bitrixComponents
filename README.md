@@ -5,6 +5,7 @@
 - ___element_cnt___ - параметр **bIncCnt** для метода ```CIBlockSection::GetList```
 - ___select___      - параметр **Select** для метода ```CIBlockSection::GetList```
 - ___count___       - количество доставаемых секций (по умолчанию достаются все)
+- ___load_urls___   - если параметр указан, то будут заполняться ссылки ```LIST_PAGE_URL``` и ```SECTION_PAGE_URL```
 
 пример использования
 ```php
