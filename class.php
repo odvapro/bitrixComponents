@@ -1,5 +1,6 @@
 <?php
 
+use \Bitrix\Main\Error;
 use \Bitrix\Main\ErrorCollection;
 use \Bitrix\Main\Security\Sign\Signer;
 
@@ -104,7 +105,7 @@ class Form extends CBitrixComponent
 	private function processErrors()
 	{
 		if (!empty($this->errorCollection))
-			ShowError($error->getMessage());
+			ShowError($this->errorCollection->current()->getMessage());
 
 		return false;
 	}
