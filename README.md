@@ -18,3 +18,18 @@
 - ___IBLOCK_ID___           - ID инфоблока, в котором находится раздел. ___Обязателен.
 - ___props___               - массив CODE свойств, которые нужно достать (_если в массиве будет элемент *, то загрузятся все поля_)
 - ___show_element_cnt___    - количество элементов у раздела
+
+Пример использования
+```php
+$APPLICATION->IncludeCOmponent(
+	'odva:elements',
+	'',
+	[
+		'id' => 2,
+		'code' => $_GET['SECTION_ELEMENT_CODE'],
+		'iblock_id' => 3,
+		'props' => ['UF_CASES_CONSULTATION', 'UF_TREATING_DISEASES'],
+		'show_element_cnt' => true,
+	]
+);
+```
